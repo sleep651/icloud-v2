@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import oracle.sql.CLOB;
@@ -36,6 +37,8 @@ import com.apps.mobile.domain.InvalidTicketException;
 import com.apps.mobile.domain.LhxcTradeDay;
 import com.apps.mobile.domain.LhxcTradeMon;
 import com.apps.mobile.domain.LhxcZiYou;
+import com.apps.mobile.domain.MarketBean;
+import com.apps.mobile.domain.MarketGroupBean;
 import com.apps.mobile.domain.MenuBean;
 import com.apps.mobile.domain.ReportBean;
 import com.apps.mobile.domain.ResponseEmptyProperty;
@@ -826,7 +829,65 @@ public class MobileService implements IMobileService {
 					+ e.toString());
 		}
 	}
+	public ResponsePropertyList<MarketGroupBean> getMarketGroupList(String ticket) {
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketGroupList", params));
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
 
+	public ResponsePropertyList<MarketBean> getMarketList(String ticket,String market_id) {
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				params.put("market_id", market_id);
+				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketList", params));
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
+
+	public ResponseEmptyProperty detainMarketExec(String ticket,
+			String market_id, String serv_number, String line_info,
+			String isnt_trace, String exec_note) {
+   		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("V_MARKET_ID", market_id);
+				params.put("V_SERV_NUMBER", serv_number);
+				params.put("V_LINE_INFO", line_info);
+				params.put("V_USER_ID", userAccount.getUser_id());
+				params.put("V_EXEC_NOTE", exec_note);
+				params.put("V_ISNT_TRACE", isnt_trace);
+				taskDao.getSqlMapClientTemplate().insert("mobile.exec_market", params);
+				
+				return new ResponseEmptyProperty(WsConstants.SHT_SUCCESS, "执行维系成功！");
+			} else {
+				return new ResponseEmptyProperty(WsConstants.SHT_NO_SESSION, "无效的ticket:ticket=" + ticket);
+			}
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return new ResponseEmptyProperty(WsConstants.SHT_ERROR, "服务端异常:" + e.toString());
+		}
+	}
 	/***************************************************************************************
 	 * 私有方法 begin=======================>>
 	 *****************************************************************************************/
@@ -1557,6 +1618,4 @@ public class MobileService implements IMobileService {
 					+ e.toString());
 		}
 	}
-
-
 }

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Context displayName="icloud-v2" docBase="icloud-v2" path="/icloud-v2" workDir="work/Catalina/localhost/icloud-v2">
 	<!-- 移动服务器：
-	<Resource 
-		name="jdbc/odsdb_icloud-v2" 
+	<Resource
+		name="jdbc/odsdb_icloud-v2"
 		type="javax.sql.DataSource"
 		auth="Container" 
 		driverClassName="oracle.jdbc.driver.OracleDriver"
@@ -34,7 +34,7 @@
 		validationQuery="select * from dual"
 		/>
 	-->
-	<!-- 移动服务器：使用jndi+c3p0连接池  -->
+	<!-- 移动服务器：使用jndi+c3p0连接池  
 	<Resource 
 		name="jdbc/odsdb_icloud-v2"    
         type="com.mchange.v2.c3p0.ComboPooledDataSource"   
@@ -52,9 +52,9 @@
         checkoutTimeout="5000"
         maxIdleTimeExcessConnections="1800"
         /> 	
-        
+        -->
 	<!-- 本地测试：使用jndi+c3p0连接池-->	
-<!-- 	<Resource 
+	<Resource 
 		name="jdbc/odsdb_icloud-v2"    
         type="com.mchange.v2.c3p0.ComboPooledDataSource"   
         maxPoolSize="50" 
@@ -63,17 +63,18 @@
         initialPoolSize="10"  
         maxIdleTime="7200"  
         factory="org.apache.naming.factory.BeanFactory"    
-        user="wangbc" 
-        password="wbc123#"    
+        user="wxy" 
+        password="wxy"    
         driverClass="oracle.jdbc.driver.OracleDriver"    
-        jdbcUrl="jdbc:oracle:thin:@135.148.72.245:1521:marketdb1" 
+        jdbcUrl="jdbc:oracle:thin:@localhost:1521:orcl" 
         testConnectionOnCheckin="true"
         automaticTestTable="t2_user" 
         idleConnectionTestPeriod="60" 
         checkoutTimeout="5000"
         maxIdleTimeExcessConnections="1800"
-        />  -->
-<!--   <Resource 
+        /> 
+<!--  电信测试库：使用jndi+c3p0连接池  
+<Resource 
 		name="jdbc/odsdb_icloud-v2"    
         type="com.mchange.v2.c3p0.ComboPooledDataSource"   
         maxPoolSize="50" 
@@ -92,7 +93,7 @@
         checkoutTimeout="5000"
         maxIdleTimeExcessConnections="1800"
         /> 
-  -->
+ -->
 
 
 

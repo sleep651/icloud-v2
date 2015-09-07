@@ -18,6 +18,8 @@
 	 <typeAlias alias="ChartCondition" type="com.apps.mobile.domain.ChartCondition"/>
 	 <typeAlias alias="chartType" type="com.apps.mobile.domain.ChartType"/>
 	 <typeAlias alias="customization" type="com.apps.mobile.domain.Customization"/>
+	 <typeAlias alias="MarketBean" type="com.apps.mobile.domain.MarketBean"/>
+	 <typeAlias alias="MarketGroupBean" type="com.apps.mobile.domain.MarketGroupBean"/>
 	 
 	 <select id="isVersionAvailable" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		  select count(*) from t2_version
@@ -454,5 +456,51 @@
 			and t.dim_id='$dimId$'
 		</isNotEmpty>
 		
-     </select>          	 
+     </select>     
+    <select id="getMarketGroupList" resultClass="MarketGroupBean" parameterClass="java.util.HashMap">
+		select
+		    distinct
+		    t.market_id,
+		    t.market_name
+		  from t2_market_list t
+		 where sysdate between begin_date and end_date
+		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
+		   order by t.market_id
+	</select>
+    <select id="getMarketList" resultClass="MarketBean" parameterClass="java.util.HashMap">
+		select t.serv_number, /*号码*/
+		       t.user_name,/*姓名*/
+		       t.brand_name,/*品牌*/
+		       t.marketing_case_name,/*营销案*/
+		       t.credit_name,/*信誉度等级*/
+		       t.net_dur,/*网龄*/
+		       t.usim_flag,/*是否USIM卡*/
+		       TO_CHAR(t.arpu, 'FM99990.00') arpu,/*ARPU*/
+		       TO_CHAR(t.call_dur, 'FM99990.00') call_dur,/*通话时长*/
+		       TO_CHAR(t.call_cnt, 'FM99990.00') call_cnt,/*通话次数*/
+		       TO_CHAR(t.flux_2g, 'FM99990.00') flux_2g,/*2G流量*/
+		       TO_CHAR(t.flux_3g, 'FM99990.00') flux_3g,/*3G流量*/
+		       TO_CHAR(t.flux_4g, 'FM99990.00') flux_4g,/*4G流量*/
+		       t.point_cnt,/*积分余额*/
+		       t.campseg_content, /*营销用语*/
+		       t.detain_info_cur /*维系内容*/
+		  from t2_market_list t
+		 where (t.coun_manager_id = '$user_id$' or
+		       t.chnl_manager_id = '$user_id$')
+		   and t.deal_flag = 2
+		   and t.busi_type = '2'/*这个条件是否需要，如果需要的话就替换原来的接口getDetainLossStat*/
+		   and t.market_id= '$market_id$'
+		 order by t.cur_mon_detain_times desc
+	</select>
+    <parameterMap id="ExecMarketMap" class="java.util.Map">
+    	<parameter property="V_MARKET_ID" mode="IN" jdbcType="VARCHAR2"/>
+    	<parameter property="V_SERV_NUMBER" mode="IN" jdbcType="VARCHAR2"/>
+    	<parameter property="V_USER_ID" mode="IN" jdbcType="VARCHAR2"/>
+    	<parameter property="V_LINE_INFO" mode="IN" jdbcType="VARCHAR2"/>
+    	<parameter property="V_EXEC_NOTE" mode="IN" jdbcType="VARCHAR2"/>
+    	<parameter property="V_ISNT_TRACE" mode="IN" jdbcType="INTEGER"/>
+	</parameterMap>
+    <procedure id="exec_market" parameterMap="ExecMarketMap">
+	   {call P_EXEC_MARKET(?,?,?,?,?,?)}
+	</procedure>            	 
 </sqlMap>

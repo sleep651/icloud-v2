@@ -5,7 +5,6 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import com.apps.mobile.domain.ChartCondition;
-import com.apps.mobile.domain.ChartConfig;
 import com.apps.mobile.domain.ChartDim;
 import com.apps.mobile.domain.ChartTitle;
 import com.apps.mobile.domain.ChartType;
@@ -13,15 +12,17 @@ import com.apps.mobile.domain.ClientVersionBean;
 import com.apps.mobile.domain.Customization;
 import com.apps.mobile.domain.DataDateBean;
 import com.apps.mobile.domain.HomeReportBean;
+import com.apps.mobile.domain.LhxcSheHui;
 import com.apps.mobile.domain.LhxcTradeDay;
 import com.apps.mobile.domain.LhxcTradeMon;
 import com.apps.mobile.domain.LhxcZiYou;
+import com.apps.mobile.domain.MarketBean;
+import com.apps.mobile.domain.MarketGroupBean;
 import com.apps.mobile.domain.MenuBean;
 import com.apps.mobile.domain.ReportBean;
 import com.apps.mobile.domain.ResponseEmptyProperty;
 import com.apps.mobile.domain.ResponseProperty;
 import com.apps.mobile.domain.ResponsePropertyList;
-import com.apps.mobile.domain.LhxcSheHui;
 import com.apps.mobile.domain.TendencyMap;
 import com.apps.mobile.domain.UserAccount;
 
@@ -1231,6 +1232,80 @@ public interface IMobileService {
 *************************************************************************************/
 public ResponseProperty<ChartType> getChartType(@WebParam(name = "chartId") String chartId,
 												@WebParam(name = "dimId") String dimId);
+/******************************************************
+《第3部分》 新增功能接口
+********************************************************/	
+/******************************************************
+3.1 getMarketGroupList【获取营销活动列表】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回MarketGroupBean列表
+			market_id:营销活动ID
+			market_name:营销活动名称
+ ********************************************************/	
+public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name = "ticket") String ticket);
+/******************************************************
+3.2 getMarketGroupList【获取营销列表】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+		String market_id		营销活动ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回MarketBean列表
+			serv_number:号码
+			user_name:姓名
+			brand_name:品牌
+			marketing_case_name:营销案
+			credit_name:信誉度等级
+			net_dur:网龄
+			usim_flag:是否USIM卡
+			arpu:ARPU
+			call_dur:通话时长
+			call_cnt:通话次数
+			flux_2g:2G流量
+			flux_3g:3G流量
+			flux_4g:4G流量
+			point_cnt:积分余额
+			campseg_content:营销用语
+			detain_info_cur:维系内容			
+ ********************************************************/	
+public ResponsePropertyList<MarketBean> getMarketList(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "market_id") String market_id);
+/******************************************************
+3.3 detainMarketExec【获取营销活动列表】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+		String market_id		营销活动ID
+		String serv_number		电话号码
+		String line_info		联系方式（电话|短信|上门））
+		String isnt_trace	是否跟踪（0：否，1：是）	
+		String exec_note	备注		
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述		
+ ********************************************************/	
+public ResponseEmptyProperty detainMarketExec(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "market_id") String market_id,
+		@WebParam(name = "serv_number") String serv_number,
+		@WebParam(name = "line_info") String line_info,
+		@WebParam(name = "isnt_trace") String isnt_trace,
+		@WebParam(name = "exec_note") String exec_note);
 }
 
 
