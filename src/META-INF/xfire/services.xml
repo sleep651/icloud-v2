@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans>
+  <service xmlns="http://xfire.codehaus.org/config/1.0">
+      <name>BranchService</name>
+      <namespace>http://com.teamsun.icloud/BranchService</namespace>
+      <serviceClass>com.apps.branch.service.BranchService</serviceClass>
+  </service>
+</beans>

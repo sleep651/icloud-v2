@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	   default-autowire="byName" default-lazy-init="true">
+
+	<!-- 属性文件读入 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:config/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- jndi 数据源 -->
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName"><value>${jndiName}</value></property>
+    </bean>
+    <!-- jndi DB2 数据源 -->
+    <bean id="dataSource_DB2" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName"><value>${jndiName_DB2}</value></property>
+    </bean>    
+    <!-- jndi teradata 数据源 -->
+    <!--
+    <bean id="dataSource_Teradata" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName"><value>${jndiName_Teradata}</value></property>
+    </bean>
+ 	-->
+	<!-- jdbc.properties方式数据源
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.oracle.driver}"/>
+		<property name="url" value="${jdbc.oracle.url}"/>
+		<property name="username" value="${jdbc.oracle.username}"/>
+		<property name="password" value="${jdbc.oracle.password}"/>
+	</bean> -->
+	
+	<!-- HSQL jdbc.properties方式数据源 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.hsql.driver}"/>
+		<property name="url" value="${jdbc.hsql.url}"/>
+		<property name="username" value="${jdbc.hsql.username}"/>
+		<property name="password" value="${jdbc.hsql.password}"/>
+	</bean>
+    -->
+    
+    <!-- 事务管理 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+    <!-- 定义切面，进行过滤 -->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="serviceMethod" expression="execution(* com.apps.*.services.*Service.*(..))" />
+	    <aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice"/>
+	</aop:config>	
+	<aop:aspectj-autoproxy/>
+	<bean class="com.apps.common.auth.LogBefore" />
+	<!-- 基本事务定义,使用transactionManager作事务管理,默认get* find*方法的事务为readonly,其余方法按默认设置. 默认的设置请参考Spring文档事务一章. -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true"/>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="qry*" read-only="true"/>
+			<tx:method name="query*" read-only="true"/>
+			<tx:method name="load*" read-only="true"/>
+			<tx:method name="save*" read-only="false" rollback-for="Exception" propagation="REQUIRED"/>
+			<tx:method name="*" rollback-for="Exception" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>		
+	<!-- 基本数据库操作类	-->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+</beans>

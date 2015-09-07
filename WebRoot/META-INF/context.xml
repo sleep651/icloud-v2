@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context displayName="icloud-v2" docBase="icloud-v2" path="/icloud-v2" workDir="work/Catalina/localhost/icloud-v2">
+	<!-- 移动服务器：
+	<Resource 
+		name="jdbc/odsdb_icloud-v2" 
+		type="javax.sql.DataSource"
+		auth="Container" 
+		driverClassName="oracle.jdbc.driver.OracleDriver"
+		url="jdbc:oracle:thin:@10.251.5.70:1521:zhdb1" 
+		username="icloud"
+		password="Icloud_2013"
+		maxWait="5000"
+		maxActive="50"
+		maxIdle="20"
+		initialSize="5"
+		minIdle="5"
+		validationQuery="select * from dual"
+		/>
+	 -->
+	 <!-- 本地测试：
+	<Resource 
+		name="jdbc/odsdb_icloud-v2" 
+		type="javax.sql.DataSource"
+		auth="Container" 
+		driverClassName="oracle.jdbc.driver.OracleDriver"
+		url="jdbc:oracle:thin:@135.148.72.245:1521:marketdb1" 
+		username="wangbc"
+		password="wbc123#"
+		maxWait="5000"
+		maxActive="50"
+		maxIdle="20"
+		initialSize="2"
+		minIdle="5"
+		validationQuery="select * from dual"
+		/>
+	-->
+	<!-- 移动服务器：使用jndi+c3p0连接池  -->
+	<Resource 
+		name="jdbc/odsdb_icloud-v2"    
+        type="com.mchange.v2.c3p0.ComboPooledDataSource"   
+        maxPoolSize="50" 
+        minPoolSize="20" 
+        acquireIncrement="10"  
+        initialPoolSize="10"  
+        maxIdleTime="7200"  
+        factory="org.apache.naming.factory.BeanFactory"    
+        user="icloud" 
+        password="Icloud_2013"    
+        driverClass="oracle.jdbc.driver.OracleDriver"    
+        jdbcUrl="jdbc:oracle:thin:@10.251.5.70:1521:zhdb1"  
+        idleConnectionTestPeriod="60" 
+        checkoutTimeout="5000"
+        maxIdleTimeExcessConnections="1800"
+        /> 	
+        
+	<!-- 本地测试：使用jndi+c3p0连接池-->	
+<!-- 	<Resource 
+		name="jdbc/odsdb_icloud-v2"    
+        type="com.mchange.v2.c3p0.ComboPooledDataSource"   
+        maxPoolSize="50" 
+        minPoolSize="20" 
+        acquireIncrement="10"  
+        initialPoolSize="10"  
+        maxIdleTime="7200"  
+        factory="org.apache.naming.factory.BeanFactory"    
+        user="wangbc" 
+        password="wbc123#"    
+        driverClass="oracle.jdbc.driver.OracleDriver"    
+        jdbcUrl="jdbc:oracle:thin:@135.148.72.245:1521:marketdb1" 
+        testConnectionOnCheckin="true"
+        automaticTestTable="t2_user" 
+        idleConnectionTestPeriod="60" 
+        checkoutTimeout="5000"
+        maxIdleTimeExcessConnections="1800"
+        />  -->
+<!--   <Resource 
+		name="jdbc/odsdb_icloud-v2"    
+        type="com.mchange.v2.c3p0.ComboPooledDataSource"   
+        maxPoolSize="50" 
+        minPoolSize="20" 
+        acquireIncrement="10"  
+        initialPoolSize="10"  
+        maxIdleTime="7200"  
+        factory="org.apache.naming.factory.BeanFactory"    
+        user="wangbc" 
+        password="wbc123#"    
+        driverClass="oracle.jdbc.driver.OracleDriver"    
+        jdbcUrl="jdbc:oracle:thin:@135.148.72.245:1521:marketdb1" 
+        testConnectionOnCheckin="true"
+        automaticTestTable="t2_user" 
+        idleConnectionTestPeriod="60" 
+        checkoutTimeout="5000"
+        maxIdleTimeExcessConnections="1800"
+        /> 
+  -->
+
+
+
+    <!-- 本地测试：db2-->
+	<Resource name="jdbc/odsdb2_icloud-v2" 
+		auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="com.ibm.db2.jcc.DB2Driver"
+		url="jdbc:db2://135.148.72.1:50000/GSEDW" 
+		username="edwjob"
+		password="job_teamsun_1505" 
+		maxActive="5" 
+		maxIdle="20" 
+		maxWait="5000" />   
+</Context>

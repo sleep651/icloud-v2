@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<display-name>甘肃移动数据门户手机版</display-name>
+
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>icloud-v2.root</param-value>
+	</context-param>
+	<!-- Spring ApplicationContext配置文件的路径,可使用通配符,多个路径用,号分隔此参数用于后面的Spring Context Loader -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath*:spring/applicationContext.xml
+		</param-value>
+	</context-param>
+	<!-- Character Encoding filter -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--  Spring MVC 的Servlet，它将加载WEB-INF/annomvc-servlet.xml 的配置文件，以启动Spring MVC模块-->
+	<servlet>
+		<servlet-name>annomvc</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>annomvc</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<!-- DWR Ajax, 如果没安装plugins/DWR, Tomcat会报错,但不影响运行-->
+	<servlet>
+		<servlet-name>dwr-invoker</servlet-name>
+		<servlet-class>uk.ltd.getahead.dwr.DWRServlet</servlet-class>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>scriptCompressed</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dwr-invoker</servlet-name>
+		<url-pattern>/dwr/*</url-pattern>
+	</servlet-mapping>
+	
+	<!--Spring ApplicationContext 载入 -->
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<!-- Spring 刷新Introspector防止内存泄露 -->
+	<listener>
+		<listener-class>
+			org.springframework.web.util.IntrospectorCleanupListener
+		</listener-class>
+	</listener>
+
+	<!-- XFireServlet，搭建webservice-->
+<!--  
+    <servlet>  
+        <servlet-name>XFireServlet</servlet-name>  
+        <servlet-class>org.codehaus.xfire.transport.http.XFireConfigurableServlet</servlet-class>  
+        <load-on-startup>0</load-on-startup>  
+    </servlet>  
+    -->  
+    
+    <servlet>  
+        <servlet-name>XFireServlet</servlet-name>  
+        <!-- <display-name>XFireServlet</display-name>  --> 
+        <servlet-class>org.codehaus.xfire.spring.XFireSpringServlet</servlet-class>  
+    </servlet>  
+	<servlet-mapping>
+		<servlet-name>XFireServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+	
+	<!--内存数据库载入
+	<listener>
+		<listener-class>com.teamsun.components.listener.H2WebStart</listener-class>
+	</listener>
+	 -->
+	<!-- 默认首页定义 -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- session超时定义,单位为分钟 -->
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+</web-app>

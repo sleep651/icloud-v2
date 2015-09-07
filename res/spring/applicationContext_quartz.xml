@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-lazy-init="false">
+	<description>Spring---quartz 配置</description>
+	
+	<!-- 定时服务定义 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <!-- 自动启动 -->
+        <property name="autoStartup">
+            <value>true</value>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref local="monitorTaskTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+	<!-- 定时器定义 -->
+    <bean id="monitorTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="monitorJobDetail"/>
+        </property>
+        <property name="cronExpression">
+            <!-- 每天早上8:15分触发运行 -->
+            <value>0 30 7 * * ?</value>
+        </property>
+    </bean>
+
+    <!-- JobDetail定义 -->
+    <bean id="monitorJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject"><ref bean="monitorJob"/></property>
+        <property name="targetMethod"><value>execute</value></property>
+        <property name="concurrent" value="false"/>
+    </bean>
+
+    <!-- Job定义 -->
+    <bean id="monitorJob" class="com.quartz.monitorJob">
+    	<property name="mailService" ref="mailService" />
+    </bean>
+	<bean id="mailService" class="com.quartz.MailService">
+		<property name="mailSender" ref="mailSender"></property>
+	</bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="10.52.17.2" />
+		<property name="javaMailProperties">
+		  <props>
+		    <!-- 如果要使用用户名和密码验证,这一步需要设置为true -->
+		  	<prop key="mail.smtp.auth">false</prop>
+		  </props>
+		</property>
+		<property name="username">
+			<value>het</value>
+		</property>
+		<property name="password">
+			<value>123456</value>
+		</property>
+	</bean>
+
+</beans>

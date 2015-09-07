@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="mobile">
+	 <typeAlias alias="UserAccount" type="com.apps.mobile.domain.UserAccount"/>
+	 <typeAlias alias="ClientVersionBean" type="com.apps.mobile.domain.ClientVersionBean"/>
+	 <typeAlias alias="UserAccount" type="com.apps.mobile.domain.UserAccount"/>
+	 <typeAlias alias="HomeReportBean" type="com.apps.mobile.domain.HomeReportBean"/>
+	 <typeAlias alias="ReportBean" type="com.apps.mobile.domain.ReportBean"/>
+	 <typeAlias alias="MenuBean" type="com.apps.mobile.domain.MenuBean"/>
+	 <typeAlias alias="DataDateBean" type="com.apps.mobile.domain.DataDateBean"/>
+	 <typeAlias alias="TendencyMap" type="com.apps.mobile.domain.TendencyMap"/>
+	 <typeAlias alias="ChartTitle" type="com.apps.mobile.domain.ChartTitle"/>
+	 <typeAlias alias="ChartDim" type="com.apps.mobile.domain.ChartDim"/>
+	 <typeAlias alias="ChartCondition" type="com.apps.mobile.domain.ChartCondition"/>
+	 <typeAlias alias="chartType" type="com.apps.mobile.domain.ChartType"/>
+	 <typeAlias alias="customization" type="com.apps.mobile.domain.Customization"/>
+	 
+	 <select id="isVersionAvailable" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		  select count(*) from t2_version
+		       where   v_no  in '$clientVersion$' and v_state='00A'
+     </select>	
+     	 <select id="isVersionAvailableNew" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		  select count(*) from t2_version
+		       where  v_no  in '$clientVersion$' and package_name = '$package_name$' and v_state='00A'
+     </select>	
+     <select id="getLastVersion" resultClass="ClientVersionBean">
+		 select
+		 	v_no,
+			v_down,
+			v_date,
+			v_state
+		from
+			 (select 
+				v_no,
+				v_down,
+				v_date,
+				v_state
+			 from t2_version 
+			 where 1=1
+			 and v_state='00A'
+			 order by v_date desc,v_no desc)
+		  where rownum = 1 
+     </select>
+     <!-- 登录备份 最原始方式 -->
+	 <!-- <select id="isCodeLogonSuccess" resultClass="UserAccount" parameterClass="java.util.HashMap">
+		select u.user_id,
+			   u.phone_number,
+		       u.user_name,
+		       u.org_id,
+		       u.org_name,
+		       u.imsi
+		  from t2_user u
+		where status='00A'
+		<isNotEmpty property="pattern_code">
+			and u.pattern_code='$pattern_code$'
+		</isNotEmpty>
+		<isNotEmpty property="imsiCode">
+			and u.imsi='$imsiCode$'
+		</isNotEmpty>
+		<isNotEmpty property="imeiCode">
+			and u.imei='$imeiCode$'
+		</isNotEmpty>
+		/*login_type:1检查imsi和imei;2只检查imsi*/
+	    and((
+	          u.login_type=1
+		<isNotEmpty property="imsiCode">
+			and u.imsi='$imsiCode$'
+		</isNotEmpty>
+		<isNotEmpty property="imeiCode">
+			and u.imei='$imeiCode$'
+		</isNotEmpty>)
+	      or(
+	          u.login_type=2
+		<isNotEmpty property="imsiCode">
+			and u.imsi='$imsiCode$'
+		</isNotEmpty>
+	      ))		
+     </select>	      -->
+
+
+	<!-- 二期修改:新登录方式 -->
+	<select id="isCodeLogonSuccess" resultClass="UserAccount"
+		parameterClass="java.util.HashMap">
+		select u.user_id,
+		u.phone_number,
+		u.user_name,
+		u.org_id,
+		u.org_name,
+		u.pos_org_id,
+		u.pos_org_name,
+		u.imei,
+		u.imsi,
+		u.pattern_code,
+		u.status,
+		u.login_type,
+		u.password,
+		u.user_acct
+		from t2_user u
+		where u.status = '00A'
+		<isNotEmpty property="pattern_code">
+			and u.pattern_code='$pattern_code$'
+		</isNotEmpty>
+		<isNotEmpty property="user_acct">
+			and u.user_acct='$user_acct$'
+		</isNotEmpty>
+		<isNotEmpty property="password">
+			and u.password='$password$'
+		</isNotEmpty>
+		<isNotEmpty property="package_name">
+			and u.package_name = '$package_name$'
+		</isNotEmpty>
+	</select>
+
+     
+ <!--     
+	 <insert id="insertLogonLog" parameterClass="java.util.HashMap">
+	      insert into T2_LOGON
+	      (
+	      	 PHONE_NUMBER,
+	         PATTERN_CODE,
+	         IMEI,
+	         IMSI,
+	         SYSTEMVERSION,
+	         CLIENTVERSION,
+	         RESULT,
+	         LOGDATE   
+	      )
+	      values(
+	         '$phone_number$',
+		     '$password$',
+		     '$imeiCode$',
+		     '$imsiCode$',
+		     '$systemVersion$',
+		     '$clientVersion$',
+		     '$result$',
+			 sysdate
+	      )
+	</insert>  -->
+
+	<insert id="insertLogonLog" parameterClass="java.util.HashMap">
+		insert into T2_LOGON
+		(
+		USER_ACCT,
+		USER_PWD,
+		PATTERN_CODE,
+		LOGDATE,
+		RESULT
+		)
+		values(
+		'$user_acct$',
+		'$password$',
+		'$pattern_code$',
+		sysdate,
+		'$result$'
+		)
+	</insert>
+
+	<insert id="insertRegistCheckLog" parameterClass="java.util.HashMap">
+		insert into T2_REGIST_CHECK_LOG
+		(
+		ID,
+		PHONE_NUMBER,
+		USER_NAME,
+		IMEI,
+		IMSI,
+		SYSTEMVERSION,
+		CLIENTVERSION,
+		RESULT,
+		POS_ORG_ID,
+		USER_ACCT,
+		LOGDATE,
+		PACKAGE_NAME
+		)
+		values(
+		'$id$',
+		'$phone_number$',
+		'$user_name$',
+		'$imeiCode$',
+		'$imsiCode$',
+		'$systemVersion$',
+		'$clientVersion$',
+		'$result$',
+		'$posOrgId$',
+		'$phone_number$',
+		sysdate,
+		'$pakname$'
+		)
+	</insert>
+	
+	<!-- 申请注册备份 -->
+    <!--  <update id="applyForRegist" parameterClass="java.util.HashMap">
+      update T2_REGIST_CHECK_LOG
+      	set result=1,
+	      	user_name='$user_name$',
+	      	phone_number='$phone_number$'
+      where id='$id$'   
+     </update> 	 -->
+     
+     <!-- 二期 申请注册修改 -->
+      <update id="applyForRegist" parameterClass="java.util.HashMap">
+      update T2_REGIST_CHECK_LOG
+      	set user_name='$user_name$',
+	      	IMEI='$imeiCode$',
+	      	IMSI='$imsiCode$',
+	      	SYSTEMVERSION='$systemVersion$',
+	      	CLIENTVERSION='$clientVersion$'
+	  where	phone_number='$phone_number$'
+     </update> 	
+     <!-- 检查是否已经申请注册 -->
+       <select id="testApplyForRegist" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from T2_REGIST_CHECK_LOG
+			where phone_number='$phone_number$'
+     </select>
+     <select id="testApplyUser" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		SELECT COUNT(*) FROM T2_USER
+		  WHERE phone_number='$phone_number$'
+     </select>
+     <!-- 原修改手势码备份 -->    
+     <!-- <update id="updatePattern" parameterClass="java.util.HashMap">
+      update t2_user
+      set pattern_code='$newPassword$'
+      where pattern_code='$oldPassword$'   
+		and user_id='$user_id$'
+     </update>  --> 
+     <!-- 二期修改  修改密码 -->
+     <update id="updatePassword" parameterClass="java.util.HashMap">
+      update t2_user
+      set password='$newPassword$'  
+		where user_id='$user_id$'
+     </update> 
+      <!-- 二期修改  修改手势码-->
+       <update id="updatePattern" parameterClass="java.util.HashMap">
+      update t2_user
+      set pattern_code='$newPassword$'  
+		where user_id='$user_id$'
+     </update>  
+     <select id="isApplyForRegist" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*)
+		  	from T2_REGIST_CHECK_LOG
+		 where result = '1'
+			and imsi='$imsiCode$'
+			and imei='$imeiCode$'
+     </select>	  
+     <select id="testSimpleSql" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		  select count(*) from dual
+     </select>	                
+     
+     <select id="getHomeReportList" resultClass="HomeReportBean" parameterClass="java.util.HashMap">
+		select
+		    p2.rep_id,
+		    p3.rep_name,
+		    p3.rep_date_sql max_date,
+		    p3.data_source_id data_source
+		from
+		 t2_user_role p1,
+		 t2_role_home_page p2,
+		 t2_home_page p3
+		where p1.user_id = '$user_id$'
+		   and p1.role_id = p2.role_id
+		   and p2.rep_id=p3.rep_id
+		   order by rep_pos
+     </select>  		 
+     <select id="getHomeRepConfList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select rep_id,
+		       rep_name,
+		       rep_sql,
+		       rep_head_sql,
+		       rep_date_sql,
+		       rep_goin_sql,
+		       rep_desc,
+		       rep_pos,
+		       data_source_id data_source
+		  from t2_home_page
+		 where rep_id = '$rep_id$'
+     </select>  		 
+     <select id="getDynamicRepOfString" resultClass="java.lang.String" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  		 
+     <select id="getDynamicRepOfInteger" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  		 
+     <select id="getDynamicRepOfHashMap" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  		 
+     <!-- 原有菜单备份 -->
+     <!-- <select id="getMenuList" resultClass="MenuBean" parameterClass="java.util.HashMap">
+		select t.menu_id,
+             t.menu_name,
+             t.super_menu,
+             t.menu_lvl,
+             t.menu_pic_name,
+             t.menu_pos,
+             t.menu_style,
+             t.isnew,
+             t.rep_id
+        from t2_menu t
+        where t.menu_state='00A' 
+        	and t.menu_lvl=1
+		<isNotEmpty property="tab_id">
+			and t.tab_id='$tab_id$'
+		</isNotEmpty>        	
+     </select>  -->
+
+	<!-- 二期修改 -->
+	<select id="getMenuList" resultClass="MenuBean" parameterClass="java.util.HashMap">
+		select t.menu_id,
+		t.menu_name,
+		t.super_menu,
+		t.menu_lvl,
+		t.menu_pic_name,
+		t.menu_pos,
+		t.menu_style,
+		t.isnew,
+		t.rep_id,
+		t.tab_id
+		from t2_menu t,
+		t2_user_menu s
+		where t.menu_state='00A'
+		and t.menu_id = s.menu_id
+		<isNotEmpty property="user_id">
+			and s.user_id='$user_id$'
+		</isNotEmpty>
+		<!-- and t.menu_lvl=1 -->
+		<isNotEmpty property="super_menu">
+			and t.super_menu='$super_menu$'
+		</isNotEmpty>
+		<isNotEmpty property="tab_id">
+			and t.tab_id='$tab_id$'
+		</isNotEmpty>
+		order by t.menu_pos
+	</select>
+
+	<select id="getSubReportList" resultClass="HomeReportBean"
+		parameterClass="java.util.HashMap">
+		select
+		p1.rep_id,
+		p2.rep_name,
+		p2.rep_date_sql max_date,
+		p2.data_source_id data_source
+		from
+		t2_menu p1,
+		t2_home_page p2
+		where
+		p1.rep_id=p2.rep_id
+		and p1.super_menu = '$parentId$'
+		<isNotEmpty property="tab_id">
+			and p1.tab_id='$tab_id$'
+		</isNotEmpty>
+		order by p1.menu_pos
+	</select>  
+     
+     <select id="getDateReadModeConfig" resultClass="java.lang.String" parameterClass="java.lang.Integer">
+		select mode_id from T2_UPDATE_MODE
+     </select>	   	           	 
+     <select id="getTodayFocusSql" resultClass="java.util.HashMap">
+		select tips_date,tips_sql from T2_FIRST_TIPS
+     </select>	 
+     <select id="getDataDateList" resultClass="DataDateBean" parameterClass="java.util.HashMap">
+	    select userd_name menu_id,
+	           used_view  data_date,
+	           disp_view
+	      from T2_APK_PUSH t
+	    where T.USERD_NAME='APK_PUSH_DATE' 
+	    	and status='Enabled'  	
+     </select>
+     <!-- 获得最新时间 量化薪酬社会53019-->
+       <select id="getRepDateSql" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select rep_sql, rep_date_sql from t2_home_page t where t.rep_desc='量化薪酬'
+		and  rep_name='$rep_name$'
+     </select>	 	 
+     
+      <select id="getRepDate" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>   
+       <select id="getSummaryIndHashMap" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  
+     <!-- 获得趋势图-->
+       <select id="getTendencyMapInfo" resultClass="TendencyMap" parameterClass="java.util.HashMap">
+		select order_id, rep_id, rep_name, statis_date, org_id, org_name, ind_c1, ind_c2, ind_c3, ind_c4, ind_c5, ind_c6, ind_c7, ind_c8, ind_c9, ind_c10, ind_c11, ind_c12 from t2_graphical_analysis
+		where 1=1
+		<isNotEmpty property="order_id">
+			and order_id='$order_id$'
+		</isNotEmpty>   	
+		<isNotEmpty property="statis_date">
+			and statis_date='$statis_date$'
+		</isNotEmpty>   	
+		<isNotEmpty property="org_id">
+			and org_id='$org_id$'
+		</isNotEmpty>   	
+     </select>	   
+     <resultMap class="com.apps.mobile.domain.Customization" id="cus">
+	     <result property="user_id" column="user_id"/>
+	     <result property="chart_id" column="chart_id"/>
+	     <result property="tab_id" column="tab_id"/>
+	     <result property="chart_name" column="chart_name"/>
+	     <result property="chart_png" column="chart_png"/>
+	     <result property="pos" column="pos"/>
+     </resultMap>
+     <!-- 根据用户id获得用户定制应用列表信息 -->
+      <select id="getCustomizationMapList" resultMap="cus" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true">
+	    select s.user_id, s.chart_id, s.tab_id, t.chart_name, t.chart_png, t.pos
+  		from t2_home_chart t, t2_chart_customization s
+		where t.chart_id=s.chart_id 
+		<isNotEmpty property="userId">
+		and	s.user_id='$userId$'
+		</isNotEmpty>
+		order by t.pos	
+     </select>	
+     
+     
+      <!-- 获得ChartConfigsql语句-->
+       <select id="getChartConfigSql" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" >
+		select DIM_SQL,CHART_DATA_SQL, ALARM_SQL,CHART_TITLE_SQL,CHART_CONDITION_SQL from t2_chart_config t 
+		where 1=1
+		<isNotEmpty property="chartId">
+			and	chart_id='$chartId$'
+		</isNotEmpty> 
+		<isNotEmpty property="dimId">
+			and dim_id='$dimId$'
+		</isNotEmpty>
+		
+     </select>
+	<!-- 执行ChartTitleSql语句 -->
+	<select id="getChartTitleSql" resultClass="ChartTitle"
+		parameterClass="java.util.HashMap" remapResults="true">
+		$sql$
+	</select>
+	<!-- 执行ChartDim语句 -->
+	<select id="getChartDimSql" resultClass="ChartDim"
+		parameterClass="java.util.HashMap" remapResults="true">
+		$sql$
+	</select>
+	
+		<!-- 执行ChartDim语句 -->
+	<select id="getChartConditionSql" resultClass="ChartCondition"
+		parameterClass="java.util.HashMap" remapResults="true">
+		$sql$
+	</select>   
+	
+	
+	<!-- 获得ChartType语句-->
+       <select id="getChartType" resultClass="chartType" parameterClass="java.util.HashMap">
+		select t.chart_type from t2_chart_config t
+		where 1=1
+		<isNotEmpty property="chartId">
+			and	t.chart_id='$chartId$'
+		</isNotEmpty> 
+		<isNotEmpty property="dimId">
+			and t.dim_id='$dimId$'
+		</isNotEmpty>
+		
+     </select>          	 
+</sqlMap>

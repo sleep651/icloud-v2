@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="commonReport">
+     <select id="getChartConfig" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select t.chart_id,
+		       t.dim_id,
+		       t.dim_sql,
+		       t.alarm_sql,
+		       t.chart_data_sql,
+		       t.data_source,
+		       t.chart_type,
+		       t.chart_title_sql,
+		       t.chart_condition_sql,
+		       t.chart_color_sql,
+		       t.chart_back_color
+		  from t2_chart_config t
+		where t.chart_id='$chart_id$'
+		and t.dim_id='$dim_id$'
+     </select>  		 
+     <select id="getChartTitle" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		select t.chart_name
+		  from t2_home_chart t
+		 where t.chart_id = '$chart_id$'
+     </select>  		 
+</sqlMap>

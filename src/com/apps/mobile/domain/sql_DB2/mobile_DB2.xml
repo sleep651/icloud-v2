@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="mobile_DB2">
+    
+    <select id="testSimpleSql_DB2" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		Select count(*) from GSCD.DB_CDE_DETAIN_LATN
+    </select>
+
+     <select id="getDynamicRepOfString" resultClass="java.lang.String" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  		 
+     <select id="getDynamicRepOfInteger" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>  		 
+     <select id="getDynamicRepOfHashMap" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true" >
+		$sql$
+     </select>      
+</sqlMap>
