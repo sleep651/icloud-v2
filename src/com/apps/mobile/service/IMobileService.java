@@ -1,5 +1,8 @@
 package com.apps.mobile.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -1252,7 +1255,7 @@ public ResponseProperty<ChartType> getChartType(@WebParam(name = "chartId") Stri
  ********************************************************/	
 public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name = "ticket") String ticket);
 /******************************************************
-3.2 getMarketGroupList【获取营销列表】 
+3.2 getMarketList【获取营销列表】 
 	函数说明：获取营销活动列表
 	参数说明：
 		String ticket			用户ID（登陆成功时，系统返回的ticket）
@@ -1306,6 +1309,56 @@ public ResponseEmptyProperty detainMarketExec(@WebParam(name = "ticket") String 
 		@WebParam(name = "line_info") String line_info,
 		@WebParam(name = "isnt_trace") String isnt_trace,
 		@WebParam(name = "exec_note") String exec_note);
+
+/******************************************************
+3.4 已营销列表【获取营销活动列表】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回Map列表
+			MARKET_ID:营销活动ID
+			MARKET_NAME:营销活动名称
+			FINISH_RATE:当前完成情况
+ ********************************************************/	
+public ResponsePropertyList<Map> getMarketGroupExecList(@WebParam(name = "ticket") String ticket);
+/******************************************************
+3.5 getMarketExecList【获取已营销清单列表】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+		String market_id		营销活动ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回Map列表
+			SERV_NUMBER:号码
+			USER_NAME:姓名
+			BRAND_NAME:品牌
+			MARKETING_CASE_NAME:营销案
+			CREDIT_NAME:信誉度等级
+			NET_DUR:网龄
+			USIM_FLAG:是否USIM卡
+			ARPU:ARPU
+			CALL_DUR:通话时长
+			CALL_CNT:通话次数
+			FLUX_2G:2G流量
+			FLUX_3G:3G流量
+			FLUX_4G:4G流量
+			POINT_CNT:积分余额
+			CAMPSEG_CONTENT:营销用语
+		    EXEC_TIME:营销时间
+		    LINE_INFO:营销方式
+		    EXEC_DETAIL:营销备注				
+ ********************************************************/	
+public ResponsePropertyList<Map> getMarketExecList(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "market_id") String market_id);
 }
-
-

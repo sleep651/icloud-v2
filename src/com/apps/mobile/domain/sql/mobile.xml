@@ -502,5 +502,47 @@
 	</parameterMap>
     <procedure id="exec_market" parameterMap="ExecMarketMap">
 	   {call P_EXEC_MARKET(?,?,?,?,?,?)}
-	</procedure>            	 
+	</procedure>  
+    <select id="getMarketGroupExecList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 select
+		    t.market_id, /*营销活动id*/
+		    t.market_name,/*营销活动名称*/
+		    to_char(sum(case when t.deal_flag = 1 then 1 else 0 end)/count(1)*100.00,'FM99990.00')||'%' finish_rate/*当前完成情况*/
+		  from t2_market_list t
+		 where sysdate between begin_date and end_date
+		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
+		 group by 
+		    t.market_id,
+		    t.market_name
+		   order by t.market_id
+	</select>
+    <select id="getMarketExecList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select t.serv_number, /*号码*/
+		       t.user_name,/*姓名*/
+		       t.brand_name,/*品牌*/
+		       t.marketing_case_name,/*营销案*/
+		       t.credit_name,/*信誉度等级*/
+		       t.net_dur,/*网龄*/
+		       t.usim_flag,/*是否USIM卡*/
+		       TO_CHAR(t.arpu, 'FM99990.00') arpu,/*ARPU*/
+		       TO_CHAR(t.call_dur, 'FM99990.00') call_dur,/*通话时长*/
+		       TO_CHAR(t.call_cnt, 'FM99990.00') call_cnt,/*通话次数*/
+		       TO_CHAR(t.flux_2g, 'FM99990.00') flux_2g,/*2G流量*/
+		       TO_CHAR(t.flux_3g, 'FM99990.00') flux_3g,/*3G流量*/
+		       TO_CHAR(t.flux_4g, 'FM99990.00') flux_4g,/*4G流量*/
+		       t.point_cnt,/*积分余额*/
+		       t.campseg_content, /*营销用语*/
+		       to_char(s.exec_time,'yyyy-mm-dd hh24:mi:ss') exec_time,/*营销时间*/
+		       s.line_info,/*营销方式*/
+		       s.exec_detail /*营销备注*/
+		  from t2_market_list t,t2_market_exec s
+		 where t.market_id=s.market_id
+		   and t.serv_number=s.serv_number
+		   and (t.coun_manager_id = '$user_id$' or
+		       t.chnl_manager_id = '$user_id$')
+		   and t.deal_flag = 1
+		   and t.market_id='$market_id$'
+		   and 1 = 1
+		 order by t.cur_mon_detain_times desc
+	</select>	          	 
 </sqlMap>

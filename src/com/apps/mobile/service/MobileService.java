@@ -888,6 +888,41 @@ public class MobileService implements IMobileService {
 			return new ResponseEmptyProperty(WsConstants.SHT_ERROR, "服务端异常:" + e.toString());
 		}
 	}
+	
+	public ResponsePropertyList<Map> getMarketGroupExecList(String ticket) {
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketGroupExecList", params));
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
+
+	public ResponsePropertyList<Map> getMarketExecList(String ticket,String market_id) {
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				params.put("market_id", market_id);
+				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketExecList", params));
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}	
 	/***************************************************************************************
 	 * 私有方法 begin=======================>>
 	 *****************************************************************************************/
