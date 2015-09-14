@@ -1,6 +1,5 @@
 package com.apps.mobile.service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.jws.WebMethod;
@@ -1252,6 +1251,7 @@ public ResponseProperty<ChartType> getChartType(@WebParam(name = "chartId") Stri
 		(3)entityList：返回MarketGroupBean列表
 			market_id:营销活动ID
 			market_name:营销活动名称
+			is_class:新增加，是否需要过滤条件，1是，0否
  ********************************************************/	
 public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name = "ticket") String ticket);
 /******************************************************
@@ -1260,6 +1260,7 @@ public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name =
 	参数说明：
 		String ticket			用户ID（登陆成功时，系统返回的ticket）
 		String market_id		营销活动ID
+		String class_id			过滤条件（不启用时传空字符串）
 	返回值字段说明：
 		(1)status:返回状态；
 			0:成功;
@@ -1285,7 +1286,7 @@ public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name =
 			detain_info_cur:维系内容			
  ********************************************************/	
 public ResponsePropertyList<MarketBean> getMarketList(@WebParam(name = "ticket") String ticket,
-		@WebParam(name = "market_id") String market_id);
+		@WebParam(name = "market_id") String market_id,@WebParam(name = "class_id") String class_id);
 /******************************************************
 3.3 detainMarketExec【获取营销活动列表】 
 	函数说明：获取营销活动列表
@@ -1360,5 +1361,23 @@ public ResponsePropertyList<Map> getMarketGroupExecList(@WebParam(name = "ticket
 		    EXEC_DETAIL:营销备注				
  ********************************************************/	
 public ResponsePropertyList<Map> getMarketExecList(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "market_id") String market_id);
+/******************************************************
+3.6 getMarketClassList【获取过滤条件】 
+	函数说明：获取营销活动列表
+	参数说明：
+		String ticket			用户ID（登陆成功时，系统返回的ticket）
+		String market_id		营销活动ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回Map列表
+			CLASS_ID:条件ID
+			CLASS_NAME:条件名称
+ ********************************************************/	
+public ResponsePropertyList<Map> getMarketClassList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "market_id") String market_id);
 }

@@ -461,7 +461,8 @@
 		select
 		    distinct
 		    t.market_id,
-		    t.market_name
+		    t.market_name,
+		    t.is_class
 		  from t2_market_list t
 		 where sysdate between begin_date and end_date
 		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
@@ -488,7 +489,9 @@
 		 where (t.coun_manager_id = '$user_id$' or
 		       t.chnl_manager_id = '$user_id$')
 		   and t.deal_flag = 2
-		   and t.busi_type = '2'/*这个条件是否需要，如果需要的话就替换原来的接口getDetainLossStat*/
+		<isNotEmpty property="class_id">
+			and t.class_id = '$class_id$'
+		</isNotEmpty>		   
 		   and t.market_id= '$market_id$'
 		 order by t.cur_mon_detain_times desc
 	</select>
@@ -544,5 +547,11 @@
 		   and t.market_id='$market_id$'
 		   and 1 = 1
 		 order by t.cur_mon_detain_times desc
-	</select>	          	 
+	</select>	  
+    <select id="getMarketClassList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select t.class_id, 
+			   t.class_name
+		  from t2_market_class t
+		 where t.market_id = '$market_id$'
+	</select>	        	 
 </sqlMap>

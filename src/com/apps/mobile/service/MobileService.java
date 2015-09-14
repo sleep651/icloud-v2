@@ -846,13 +846,14 @@ public class MobileService implements IMobileService {
 		}
 	}
 
-	public ResponsePropertyList<MarketBean> getMarketList(String ticket,String market_id) {
+	public ResponsePropertyList<MarketBean> getMarketList(String ticket,String market_id,String class_id) {
 		try {
 			UserAccount userAccount = checkTicket(ticket);
 			if (userAccount != null) {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("user_id", userAccount.getUser_id());
 				params.put("market_id", market_id);
+				params.put("class_id", class_id);
 				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
 						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketList", params));
 			} else {
@@ -915,6 +916,23 @@ public class MobileService implements IMobileService {
 				params.put("market_id", market_id);
 				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
 						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketExecList", params));
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}	
+	public ResponsePropertyList<Map> getMarketClassList(String ticket,String market_id) {
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				params.put("market_id", market_id);
+				return new ResponsePropertyList(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForList("mobile.getMarketClassList", params));
 			} else {
 				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
 			}
