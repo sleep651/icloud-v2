@@ -44,6 +44,7 @@
 			 from t2_version 
 			 where 1=1
 			 and v_state='00A'
+			 and package_name = '$package_name$'
 			 order by v_date desc,v_no desc)
 		  where rownum = 1 
      </select>
