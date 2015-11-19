@@ -29,7 +29,7 @@
 		  select count(*) from t2_version
 		       where  v_no  in '$clientVersion$' and package_name = '$package_name$' and v_state='00A'
      </select>	
-     <select id="getLastVersion" resultClass="ClientVersionBean">
+     <select id="getLastVersion" resultClass="ClientVersionBean" parameterClass="java.util.HashMap">
 		 select
 		 	v_no,
 			v_down,
@@ -44,7 +44,9 @@
 			 from t2_version 
 			 where 1=1
 			 and v_state='00A'
-			 and package_name = '$package_name$'
+		<isNotEmpty property="package_name">
+			and package_name = '$package_name$'
+		</isNotEmpty>			 
 			 order by v_date desc,v_no desc)
 		  where rownum = 1 
      </select>

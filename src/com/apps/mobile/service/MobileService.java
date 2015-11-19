@@ -141,11 +141,11 @@ public class MobileService implements IMobileService {
 			if (count == 0) {// 需要更新
 				return new ResponseProperty<ClientVersionBean>(
 						WsConstants.SHT_VALIDATION, "版本过期，需要下载新版本",
-						getLastVersion());
+						getLastVersionNew(packageName));
 			} else {// 已经是可用版本
 				return new ResponseProperty<ClientVersionBean>(
 						WsConstants.SHT_SUCCESS, "当前版本可用，不需要下载新版本",
-						getLastVersion());
+						getLastVersionNew(packageName));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -951,6 +951,17 @@ public class MobileService implements IMobileService {
 		ClientVersionBean clientVersionBean = (ClientVersionBean) taskDao
 				.getSqlMapClientTemplate().queryForObject(
 						"mobile.getLastVersion");
+		return clientVersionBean;
+	}
+	/******************************************************
+	 * 获得当前最新版本信息（单个版本）
+	 ********************************************************/
+	private ClientVersionBean getLastVersionNew(String packageName) {
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("package_name", packageName);		
+		ClientVersionBean clientVersionBean = (ClientVersionBean) taskDao
+				.getSqlMapClientTemplate().queryForObject(
+						"mobile.getLastVersion",params);
 		return clientVersionBean;
 	}
 
