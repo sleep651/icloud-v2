@@ -153,14 +153,16 @@
 		USER_PWD,
 		PATTERN_CODE,
 		LOGDATE,
-		RESULT
+		RESULT,
+		PACKAGE_NAME
 		)
 		values(
 		'$user_acct$',
 		'$password$',
 		'$pattern_code$',
 		sysdate,
-		'$result$'
+		'$result$',
+		'$package_name$'
 		)
 	</insert>
 

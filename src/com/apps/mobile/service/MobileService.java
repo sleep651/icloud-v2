@@ -392,7 +392,7 @@ public class MobileService implements IMobileService {
 					} else {
 						userAccount.setIs_use_cache(false);
 					}
-					new InsertLogonLogThread(userAccount.getUser_acct(), userAccount.getPattern_code(),userAccount.getPassword(),response.getStatus().toString()).start();
+					new InsertLogonLogThread(userAccount.getUser_acct(), userAccount.getPattern_code(),userAccount.getPassword(),response.getStatus().toString(),package_name).start();
 					
 				} else {
 					response.setStatus(WsConstants.SHT_VALIDATION);
@@ -1021,12 +1021,13 @@ public class MobileService implements IMobileService {
 	}*/
 	
 	private void insertLogonLog(String user_acct, String password,
-			String pattern_code,String result) {
+			String pattern_code,String result,String package_name) {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("user_acct", user_acct);
 		params.put("password", password);
 		params.put("pattern_code", pattern_code);
 		params.put("result", result);
+		params.put("package_name", package_name);
 		taskDao.insert("mobile.insertLogonLog", params);
 	}
 
@@ -1084,21 +1085,23 @@ public class MobileService implements IMobileService {
 		private String pattern_code;
 		private String password;
 		private String result;
+		private String package_name;
 		
 		public InsertLogonLogThread() {
 
 		}
 
 		public InsertLogonLogThread(String user_acct, String pattern_code,
-				String password, String result) {
+				String password, String result,String package_name) {
 			this.user_acct = user_acct;
 			this.pattern_code = pattern_code;
 			this.password = password;
 			this.result = result;
+			this.package_name = package_name;
 		}
 
 		public void run() {
-			insertLogonLog(user_acct, password, pattern_code, result);
+			insertLogonLog(user_acct, password, pattern_code, result,package_name);
 		}
 
 	}
