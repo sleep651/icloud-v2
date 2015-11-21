@@ -1252,6 +1252,7 @@ public ResponseProperty<ChartType> getChartType(@WebParam(name = "chartId") Stri
 			market_id:营销活动ID
 			market_name:营销活动名称
 			is_class:新增加，是否需要过滤条件，1是，0否
+			market_cnt:新增加，营销数量
  ********************************************************/	
 public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name = "ticket") String ticket);
 /******************************************************
@@ -1377,6 +1378,7 @@ public ResponsePropertyList<Map> getMarketExecList(@WebParam(name = "ticket") St
 		(3)entityList：返回Map列表
 			CLASS_ID:条件ID
 			CLASS_NAME:条件名称
+			MARKET_CNT:新增加，营销数量
  ********************************************************/	
 public ResponsePropertyList<Map> getMarketClassList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "market_id") String market_id);
