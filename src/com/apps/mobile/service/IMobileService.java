@@ -1382,4 +1382,127 @@ public ResponsePropertyList<Map> getMarketExecList(@WebParam(name = "ticket") St
  ********************************************************/	
 public ResponsePropertyList<Map> getMarketClassList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "market_id") String market_id);
+
+/******************************************************
+3.7 saveReport【我要上报-新建与修改】 
+	函数说明：我要上报-新建与修改
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+		String rep_id		ID
+		String flag_id		类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+		String title		标题
+		String content		内容
+		String img_name1	图片1
+		String img_name2	图片2
+		String img_name3	图片3
+		String img_name4	图片4
+		String img_name5	图片5
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entity：返回Map
+				REP_ID:ID
+				ORG_ID:用户组织架构ID
+				USER_ID:用户ID
+				FLAG_ID:类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+				TITLE:标题
+				CONTENT:内容
+				IMG_NAME1:图片1
+				IMG_NAME2:图片2
+				IMG_NAME3:图片3
+				IMG_NAME4:图片4
+				IMG_NAME5:图片5
+				CDATE:创建时间
+				STATUS:记录状态 1：正常0：禁用
+ ********************************************************/	
+public ResponseProperty<Map> saveReport(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "rep_id") String rep_id,
+		@WebParam(name = "flag_id") String flag_id,
+		@WebParam(name = "title") String title,
+		@WebParam(name = "content") String content,
+		@WebParam(name = "img_name1") String img_name1,
+		@WebParam(name = "img_name2") String img_name2,
+		@WebParam(name = "img_name3") String img_name3,
+		@WebParam(name = "img_name4") String img_name4,
+		@WebParam(name = "img_name5") String img_name5);
+/******************************************************
+3.8 delReport【我要上报-删除】 
+	函数说明：我要上报-删除
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+		String rep_id		ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+ ********************************************************/	
+public ResponseEmptyProperty delReport(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "rep_id") String rep_id);
+/******************************************************
+3.9 getReportList【我要上报-列表】 
+	函数说明：我要上报-列表
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+		String flag_id		类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+		Integer pageSize   	每页记录数
+		Integer pageNo   	第几页		
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回Map列表
+				REP_ID:ID
+				ORG_ID:用户组织架构ID
+				USER_ID:用户ID
+				FLAG_ID:类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+				TITLE:标题
+				CONTENT:内容
+				IMG_NAME1:图片1
+				IMG_NAME2:图片2
+				IMG_NAME3:图片3
+				IMG_NAME4:图片4
+				IMG_NAME5:图片5
+				CDATE:创建时间
+				STATUS:记录状态 1：正常0：禁用
+ ********************************************************/	
+public ResponsePropertyList<Map> getReportList(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "flag_id") String flag_id,
+		@WebParam(name = "pageSize")Integer pageSize,@WebParam(name = "pageNo")Integer pageNo);
+//获取详单
+/******************************************************
+3.10 getReportDetail【我要上报-详单】 
+	函数说明：我要上报-详单
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+		String rep_id		ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entity：返回Map
+				REP_ID:ID
+				ORG_ID:用户组织架构ID
+				USER_ID:用户ID
+				FLAG_ID:类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+				TITLE:标题
+				CONTENT:内容
+				IMG_NAME1:图片1
+				IMG_NAME2:图片2
+				IMG_NAME3:图片3
+				IMG_NAME4:图片4
+				IMG_NAME5:图片5
+				CDATE:创建时间
+				STATUS:记录状态 1：正常0：禁用
+ ********************************************************/	
+public ResponseProperty<Map> getReportDetail(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "rep_id") String rep_id);
 }

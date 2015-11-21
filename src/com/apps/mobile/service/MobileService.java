@@ -25,7 +25,6 @@ import com.apps.common.utils.CommonUtil;
 import com.apps.common.utils.CryptUtil;
 import com.apps.common.utils.WsConstants;
 import com.apps.mobile.domain.ChartCondition;
-import com.apps.mobile.domain.ChartConfig;
 import com.apps.mobile.domain.ChartDim;
 import com.apps.mobile.domain.ChartTitle;
 import com.apps.mobile.domain.ChartType;
@@ -34,6 +33,7 @@ import com.apps.mobile.domain.Customization;
 import com.apps.mobile.domain.DataDateBean;
 import com.apps.mobile.domain.HomeReportBean;
 import com.apps.mobile.domain.InvalidTicketException;
+import com.apps.mobile.domain.LhxcSheHui;
 import com.apps.mobile.domain.LhxcTradeDay;
 import com.apps.mobile.domain.LhxcTradeMon;
 import com.apps.mobile.domain.LhxcZiYou;
@@ -44,11 +44,11 @@ import com.apps.mobile.domain.ReportBean;
 import com.apps.mobile.domain.ResponseEmptyProperty;
 import com.apps.mobile.domain.ResponseProperty;
 import com.apps.mobile.domain.ResponsePropertyList;
-import com.apps.mobile.domain.LhxcSheHui;
 import com.apps.mobile.domain.TendencyMap;
 import com.apps.mobile.domain.Ticket;
 import com.apps.mobile.domain.TicketVO;
 import com.apps.mobile.domain.UserAccount;
+import com.teamsun.core.dao.Page;
 
 @Component
 @WebService(serviceName = "MobileService", endpointInterface = "com.apps.mobile.service.IMobileService")
@@ -941,6 +941,118 @@ public class MobileService implements IMobileService {
 			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
 		}
 	}	
+	
+	public ResponseProperty<Map> saveReport(@WebParam(name = "ticket") String ticket,
+			@WebParam(name = "rep_id") String rep_id,
+			@WebParam(name = "flag_id") String flag_id,
+			@WebParam(name = "title") String title,
+			@WebParam(name = "content") String content,
+			@WebParam(name = "img_name1") String img_name1,
+			@WebParam(name = "img_name2") String img_name2,
+			@WebParam(name = "img_name3") String img_name3,
+			@WebParam(name = "img_name4") String img_name4,
+			@WebParam(name = "img_name5") String img_name5){
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("org_id", userAccount.getOrg_id());
+				params.put("user_id", userAccount.getUser_id());
+				if(rep_id==null||rep_id.equals("")){//新增
+					params.put("flag_id", flag_id);
+					params.put("title", title);
+					params.put("content", content);
+					params.put("img_name1", img_name1);
+					params.put("img_name2", img_name2);
+					params.put("img_name3", img_name3);
+					params.put("img_name4", img_name4);
+					params.put("img_name5", img_name5);
+					params.put("status", "1");
+            		rep_id = (String)taskDao.getSqlMapClientTemplate().insert("mobile.addReport",params);
+	        		
+				}else{//修改
+					params.put("rep_id", rep_id);
+					params.put("flag_id", flag_id);
+					params.put("title", title);
+					params.put("content", content);
+					params.put("img_name1", img_name1);
+					params.put("img_name2", img_name2);
+					params.put("img_name3", img_name3);
+					params.put("img_name4", img_name4);
+					params.put("img_name5", img_name5);
+            		taskDao.getSqlMapClientTemplate().update("mobile.updateReport",params);
+				}
+				params.put("rep_id", rep_id);
+				return new ResponseProperty(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForObject("mobile.getReportDetail", params));
+			} else {
+				return new ResponseProperty(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseProperty(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
+	public ResponseEmptyProperty delReport(@WebParam(name = "ticket") String ticket,
+			@WebParam(name = "rep_id") String rep_id){
+   		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("rep_id", rep_id);
+				params.put("status", "0");
+				taskDao.getSqlMapClientTemplate().update("mobile.delReport", params);
+				return new ResponseEmptyProperty(WsConstants.SHT_SUCCESS, "执行维系成功！");
+			} else {
+				return new ResponseEmptyProperty(WsConstants.SHT_NO_SESSION, "无效的ticket:ticket=" + ticket);
+			}
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return new ResponseEmptyProperty(WsConstants.SHT_ERROR, "服务端异常:" + e.toString());
+		}
+	}
+	public ResponsePropertyList<Map> getReportList(@WebParam(name = "ticket") String ticket,
+			@WebParam(name = "flag_id") String flag_id,Integer pageSize,Integer pageNo){
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("user_id", userAccount.getUser_id());
+				params.put("flag_id", flag_id);
+				
+                Page<Map> page = new Page<Map>(pageNo, pageSize);
+        		page = taskDao.browse("mobile.getReportList","mobile.getReportListCount",page,params);
+        		
+        		ResponsePropertyList<Map> resp = new ResponsePropertyList<Map>(WsConstants.SHT_SUCCESS,"成功", page.getResultList());
+                resp.setPageSize(pageSize);
+                resp.setPageNo(pageNo);
+                resp.setTotalCount((long)page.getTotalRows());
+        		return resp;
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}		
+	}
+	public ResponseProperty<Map> getReportDetail(@WebParam(name = "ticket") String ticket,
+			@WebParam(name = "rep_id") String rep_id){
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("rep_id", rep_id);
+				return new ResponseProperty(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForObject("mobile.getReportDetail", params));
+			} else {
+				return new ResponseProperty(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseProperty(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
 	/***************************************************************************************
 	 * 私有方法 begin=======================>>
 	 *****************************************************************************************/

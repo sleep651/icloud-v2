@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +111,11 @@ public class BaseAction {
 		String jsonString = jsonObject.toString();
 		return jsonString;
 	}
-
+	public String objectToJsonString(Object obj){
+		JSONObject object = JSONObject.fromObject(obj);
+		String jsonString = object.toString();
+		return jsonString;
+	}
 	public IBaseService getBaseService() {
 		return baseService;
 	}

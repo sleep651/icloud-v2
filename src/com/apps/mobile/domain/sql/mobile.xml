@@ -568,5 +568,103 @@
 		   and s.deal_flag = 2
 		   and t.market_id = '$market_id$'
 		 group by t.class_id, t.class_name
-	</select>	        	 
+	</select>	
+	<insert id="addReport" parameterClass="java.util.HashMap">
+		<selectKey resultClass="java.lang.String" keyProperty="temp_id" > 
+		    select sys_guid() as temp_id from dual 
+		</selectKey> 	
+		insert into T2_REPORT
+        (
+			rep_id,
+			org_id,
+			user_id,
+			flag_id,
+			title,
+			content,
+			img_name1,
+			img_name2,
+			img_name3,
+			img_name4,
+			img_name5,
+			cdate,
+			status
+        )
+        values(
+			'$temp_id$',
+			'$org_id$',
+			'$user_id$',
+			'$flag_id$',
+			'$title$',
+			'$content$',
+			'$img_name1$',
+			'$img_name2$',
+			'$img_name3$',
+			'$img_name4$',
+			'$img_name5$',
+			sysdate,
+			'$status$'
+	     )
+	</insert>	
+    <select id="getReportList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select rep_id,
+			org_id,
+			user_id,
+			flag_id,
+			title,
+			content,
+			img_name1,
+			img_name2,
+			img_name3,
+			img_name4,
+			img_name5,
+			to_char(cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
+			status
+		from T2_REPORT
+			where status=1 and flag_id='$flag_id$' and user_id='$user_id$'
+		order by rep_id desc	
+	</select>		        	 
+    <select id="getReportDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select rep_id,
+			org_id,
+			user_id,
+			flag_id,
+			title,
+			content,
+			img_name1,
+			img_name2,
+			img_name3,
+			img_name4,
+			img_name5,
+			to_char(cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
+			status
+		from T2_REPORT
+			where rep_id='$rep_id$'
+	</select>		        	 
+    <select id="getReportListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) 
+			from T2_REPORT
+		where status=1 and flag_id='$flag_id$'
+	</select>	
+	<delete id="delReport" parameterClass="java.util.HashMap">
+		update T2_REPORT t
+		   set 
+				status=0		   
+		 where rep_id='$rep_id$'
+	</delete>
+	<update id="updateReport" parameterClass="java.util.HashMap">
+		update T2_REPORT t
+		   set 
+				org_id='$org_id$',
+				user_id='$user_id$',
+				flag_id='$flag_id$',
+				title='$title$',
+				content='$content$',
+				img_name1='$img_name1$',
+				img_name2='$img_name2$',
+				img_name3='$img_name3$',
+				img_name4='$img_name4$',
+				img_name5='$img_name5$',
+				cdate=sysdate		   
+		 where rep_id='$rep_id$'
+    </update> 	
 </sqlMap>
