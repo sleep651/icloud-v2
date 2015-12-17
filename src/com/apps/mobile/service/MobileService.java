@@ -1053,6 +1053,23 @@ public class MobileService implements IMobileService {
 			return new ResponseProperty(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
 		}
 	}
+	public ResponsePropertyList<Map> getPackageList(@WebParam(name = "ticket") String ticket){
+		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("phone_number", userAccount.getPhone_number());
+        		ResponsePropertyList<Map> resp = new ResponsePropertyList<Map>(WsConstants.SHT_SUCCESS,"成功", 
+        				taskDao.getSqlMapClientTemplate().queryForList("mobile.getPackageList", params));
+        		return resp;
+			} else {
+				return new ResponsePropertyList(WsConstants.SHT_NO_SESSION,"无效的ticket:ticket=" + ticket);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponsePropertyList(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
+		}
+	}
 	/***************************************************************************************
 	 * 私有方法 begin=======================>>
 	 *****************************************************************************************/

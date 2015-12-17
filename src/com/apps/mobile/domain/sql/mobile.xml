@@ -666,5 +666,8 @@
 				img_name5='$img_name5$',
 				cdate=sysdate		   
 		 where rep_id='$rep_id$'
-    </update> 	
+    </update> 
+    <select id="getPackageList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select distinct t.package_name from t2_user t where t.phone_number='$phone_number$'
+	</select>	
 </sqlMap>

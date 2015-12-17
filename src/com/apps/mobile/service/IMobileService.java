@@ -1505,4 +1505,20 @@ public ResponsePropertyList<Map> getReportList(@WebParam(name = "ticket") String
  ********************************************************/	
 public ResponseProperty<Map> getReportDetail(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "rep_id") String rep_id);
+
+/******************************************************
+3.11 getPackageList【获取当前登录人对应的package列表】 
+	函数说明：获取当前登录人对应的package列表
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entityList：返回Map列表
+				PACKAGE_NAME:包名
+ ********************************************************/	
+public ResponsePropertyList<Map> getPackageList(@WebParam(name = "ticket") String ticket);
 }
