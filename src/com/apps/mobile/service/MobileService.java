@@ -967,7 +967,7 @@ public class MobileService implements IMobileService {
 					params.put("img_name3", img_name3);
 					params.put("img_name4", img_name4);
 					params.put("img_name5", img_name5);
-					params.put("status", "1");
+					//params.put("status", "1");
             		rep_id = (String)taskDao.getSqlMapClientTemplate().insert("mobile.addReport",params);
 	        		
 				}else{//修改
@@ -1053,6 +1053,29 @@ public class MobileService implements IMobileService {
 			return new ResponseProperty(WsConstants.SHT_ERROR, "服务端异常:"+ e.toString());
 		}
 	}
+	public ResponseProperty<Map> approveReport(String ticket,String rep_id,String status,
+			String postil,String postil_user){
+   		try {
+			UserAccount userAccount = checkTicket(ticket);
+			if (userAccount != null) {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("rep_id", rep_id);
+				params.put("status", status);
+				params.put("postil", postil);
+				params.put("postil_user", postil_user);
+				taskDao.getSqlMapClientTemplate().update("mobile.approveReport", params);
+
+				return new ResponseProperty(WsConstants.SHT_SUCCESS, "成功",
+						taskDao.getSqlMapClientTemplate().queryForObject("mobile.getReportDetail", params));				
+			} else {
+				return new ResponseProperty(WsConstants.SHT_NO_SESSION, "无效的ticket:ticket=" + ticket);
+			}
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return new ResponseProperty(WsConstants.SHT_ERROR, "服务端异常:" + e.toString());
+		}
+	}
+	
 	public ResponsePropertyList<Map> getPackageList(@WebParam(name = "ticket") String ticket){
 		try {
 			UserAccount userAccount = checkTicket(ticket);

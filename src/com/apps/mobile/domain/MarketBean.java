@@ -18,6 +18,9 @@ public class MarketBean {
 	private String campseg_content;/*营销用语*/
 	private String detain_info_cur;/*维系内容*/
 	
+	private String prod_id;  /*活动编码*/
+	private String prod_name;   /*活动内容*/
+	
 	public String getServ_number() {
 		return serv_number;
 	}
@@ -113,5 +116,17 @@ public class MarketBean {
 	}
 	public void setDetain_info_cur(String detain_info_cur) {
 		this.detain_info_cur = detain_info_cur;
+	}
+	public String getProd_id() {
+		return prod_id;
+	}
+	public void setProd_id(String prod_id) {
+		this.prod_id = prod_id;
+	}
+	public String getProd_name() {
+		return prod_name;
+	}
+	public void setProd_name(String prod_name) {
+		this.prod_name = prod_name;
 	}
 }

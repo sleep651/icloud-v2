@@ -5,6 +5,7 @@ public class MarketGroupBean {
 	private String market_name;	//营销活动名称
 	private String is_class;    //新增加，是否需要过滤条件，1是，0否
 	private String market_cnt;	//新增加，营销数量
+	private String end_date;	//新增加，活动结束日期
 	public String getMarket_cnt() {
 		return market_cnt;
 	}
@@ -28,5 +29,11 @@ public class MarketGroupBean {
 	}
 	public void setIs_class(String is_class) {
 		this.is_class = is_class;
+	}
+	public String getEnd_date() {
+		return end_date;
+	}
+	public void setEnd_date(String end_date) {
+		this.end_date = end_date;
 	}
 }

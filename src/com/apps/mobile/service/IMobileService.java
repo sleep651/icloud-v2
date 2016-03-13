@@ -1253,6 +1253,7 @@ public ResponseProperty<ChartType> getChartType(@WebParam(name = "chartId") Stri
 			market_name:营销活动名称
 			is_class:新增加，是否需要过滤条件，1是，0否
 			market_cnt:新增加，营销数量
+			end_date:新增加，活动结束日期
  ********************************************************/	
 public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name = "ticket") String ticket);
 /******************************************************
@@ -1284,7 +1285,9 @@ public ResponsePropertyList<MarketGroupBean> getMarketGroupList(@WebParam(name =
 			flux_4g:4G流量
 			point_cnt:积分余额
 			campseg_content:营销用语
-			detain_info_cur:维系内容			
+			detain_info_cur:维系内容	
+			prod_id:活动编码
+			prod_name:活动内容				
  ********************************************************/	
 public ResponsePropertyList<MarketBean> getMarketList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "market_id") String market_id,@WebParam(name = "class_id") String class_id);
@@ -1416,7 +1419,7 @@ public ResponsePropertyList<Map> getMarketClassList(@WebParam(name = "ticket") S
 				IMG_NAME4:图片4
 				IMG_NAME5:图片5
 				CDATE:创建时间
-				STATUS:记录状态 1：正常0：禁用
+				STATUS:记录状态- 为空:初始状态,1：同意,0：不同意
  ********************************************************/	
 public ResponseProperty<Map> saveReport(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "rep_id") String rep_id,
@@ -1470,7 +1473,12 @@ public ResponseEmptyProperty delReport(@WebParam(name = "ticket") String ticket,
 				IMG_NAME4:图片4
 				IMG_NAME5:图片5
 				CDATE:创建时间
-				STATUS:记录状态 1：正常0：禁用
+				STATUS:记录状态- 为空:初始状态,1：同意,0：不同意
+				POSTIL:审批内容
+				POSTIL_USER:审批人ID
+				POSTIL_USERNAME:审批人名称
+				POSTIL_USERPHONE:审批人手机号
+				POSTIL_DATE:审批时间				
  ********************************************************/	
 public ResponsePropertyList<Map> getReportList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "flag_id") String flag_id,
@@ -1501,13 +1509,56 @@ public ResponsePropertyList<Map> getReportList(@WebParam(name = "ticket") String
 				IMG_NAME4:图片4
 				IMG_NAME5:图片5
 				CDATE:创建时间
-				STATUS:记录状态 1：正常0：禁用
+				STATUS:记录状态- 为空:初始状态,1：同意,0：不同意
+				POSTIL:审批内容
+				POSTIL_USER:审批人ID
+				POSTIL_USERNAME:审批人名称
+				POSTIL_USERPHONE:审批人手机号
+				POSTIL_DATE:审批时间	
  ********************************************************/	
 public ResponseProperty<Map> getReportDetail(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "rep_id") String rep_id);
+/******************************************************
+3.11 approveReport【我要上报-审批】 
+	函数说明：我要上报-删除
+	参数说明：
+		String ticket		用户ID（登陆成功时，系统返回的ticket）
+		String rep_id		ID
+		String status		审批状态：1同意，0不同意
+		String postil		审批内容
+		String postil_user		审批人ID
+	返回值字段说明：
+		(1)status:返回状态；
+			0:成功;
+		   -1：服务端异常
+		   -2:无效的ticket
+		(2)message:返回结果描述	
+		(3)entity：返回Map
+				REP_ID:ID
+				ORG_ID:用户组织架构ID
+				USER_ID:用户ID
+				FLAG_ID:类型标识：1工作计划，2日常走访，3竞争信息收集，3渠道信息上报
+				TITLE:标题
+				CONTENT:内容
+				IMG_NAME1:图片1
+				IMG_NAME2:图片2
+				IMG_NAME3:图片3
+				IMG_NAME4:图片4
+				IMG_NAME5:图片5
+				CDATE:创建时间
+				STATUS:记录状态- 为空:初始状态,1：同意,0：不同意
+				POSTIL:审批内容
+				POSTIL_USER:审批人ID
+				POSTIL_USERNAME:审批人名称
+				POSTIL_USERPHONE:审批人手机号
+				POSTIL_DATE:审批时间		
+ ********************************************************/	
+public ResponseProperty<Map> approveReport(@WebParam(name = "ticket") String ticket,
+		@WebParam(name = "rep_id") String rep_id,@WebParam(name = "status") String status,
+		@WebParam(name = "postil") String postil,@WebParam(name = "postil_user") String postil_user);
 
 /******************************************************
-3.11 getPackageList【获取当前登录人对应的package列表】 
+3.12 getPackageList【获取当前登录人对应的package列表】 
 	函数说明：获取当前登录人对应的package列表
 	参数说明：
 		String ticket		用户ID（登陆成功时，系统返回的ticket）
@@ -1521,4 +1572,6 @@ public ResponseProperty<Map> getReportDetail(@WebParam(name = "ticket") String t
 				PACKAGE_NAME:包名
  ********************************************************/	
 public ResponsePropertyList<Map> getPackageList(@WebParam(name = "ticket") String ticket);
+
+
 }

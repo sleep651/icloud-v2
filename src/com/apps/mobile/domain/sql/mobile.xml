@@ -466,7 +466,8 @@
 		select
 		    t.market_id,
 		    t.market_name,
-		    t.is_class,       
+		    t.is_class,   
+		    to_char(t.end_date,'yyyymmdd') end_date,    
 		    count(distinct t.serv_number) market_cnt
 		  from t2_market_list t
 		 where sysdate between begin_date and end_date
@@ -474,7 +475,8 @@
 		 group by 
 		    t.market_id,
 		    t.market_name,
-		    t.is_class
+		    t.is_class,
+		    to_char(t.end_date,'yyyymmdd')
 		order by t.market_id		   
 	</select>
     <select id="getMarketList" resultClass="MarketBean" parameterClass="java.util.HashMap">
@@ -493,7 +495,9 @@
 		       TO_CHAR(t.flux_4g, 'FM99990.00') flux_4g,/*4G流量*/
 		       t.point_cnt,/*积分余额*/
 		       t.campseg_content, /*营销用语*/
-		       t.detain_info_cur /*维系内容*/
+		       t.detain_info_cur, /*维系内容*/
+		       t.prod_id,   /*活动编码*/
+               t.prod_name   /*活动内容*/
 		  from t2_market_list t
 		 where (t.coun_manager_id = '$user_id$' or
 		       t.chnl_manager_id = '$user_id$')
@@ -601,56 +605,77 @@
 			'$img_name3$',
 			'$img_name4$',
 			'$img_name5$',
-			sysdate,
-			'$status$'
+			sysdate
 	     )
 	</insert>	
     <select id="getReportList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
-		select rep_id,
-			org_id,
-			user_id,
-			flag_id,
-			title,
-			content,
-			img_name1,
-			img_name2,
-			img_name3,
-			img_name4,
-			img_name5,
-			to_char(cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
-			status
-		from T2_REPORT
-			where status=1 and flag_id='$flag_id$' and user_id='$user_id$'
-		order by rep_id desc	
+		select t.rep_id,
+			t.org_id,
+			t.user_id,
+			t.flag_id,
+			t.title,
+			t.content,
+			t.img_name1,
+			t.img_name2,
+			t.img_name3,
+			t.img_name4,
+			t.img_name5,
+			to_char(t.cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
+			t.status,
+            t.postil,
+            t.postil_user,
+            to_char(t.postil_date,'yyyy-mm-dd hh24:mi:ss') postil_date,
+            s.userPhone postil_userPhone,
+            s.userName postil_userName
+            t.postil_date
+		from T2_REPORT t
+		    left join vw_masa_user s
+		      on t.postil_user=s.userId
+			where flag_id='$flag_id$' and user_id='$user_id$'
+		order by rep_id desc
 	</select>		        	 
     <select id="getReportDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
-		select rep_id,
-			org_id,
-			user_id,
-			flag_id,
-			title,
-			content,
-			img_name1,
-			img_name2,
-			img_name3,
-			img_name4,
-			img_name5,
-			to_char(cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
-			status
-		from T2_REPORT
-			where rep_id='$rep_id$'
+		select t.rep_id,
+			t.org_id,
+			t.user_id,
+			t.flag_id,
+			t.title,
+			t.content,
+			t.img_name1,
+			t.img_name2,
+			t.img_name3,
+			t.img_name4,
+			t.img_name5,
+			to_char(t.cdate,'yyyy-mm-dd hh24:mi:ss') cdate,
+			t.status,
+            t.postil,
+            t.postil_user,
+            to_char(t.postil_date,'yyyy-mm-dd hh24:mi:ss') postil_date,
+            s.userPhone postil_userPhone,
+            s.userName postil_userName
+            t.postil_date
+		from T2_REPORT t
+		    left join vw_masa_user s
+		      on t.postil_user=s.userId
+			where t.rep_id='$rep_id$'			
 	</select>		        	 
     <select id="getReportListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		select count(*) 
 			from T2_REPORT
-		where status=1 and flag_id='$flag_id$'
+		where flag_id='$flag_id$' and user_id='$user_id$'
 	</select>	
 	<delete id="delReport" parameterClass="java.util.HashMap">
+		delete from T2_REPORT t where rep_id='$rep_id$'
+	</delete>
+	<update id="approveReport" parameterClass="java.util.HashMap">
 		update T2_REPORT t
 		   set 
-				status=0		   
+				status='$status$',		   
+				postil='$postil$',		   
+				postil_user='$postil_user$',		   
+				postil_date=sysdate		   
 		 where rep_id='$rep_id$'
-	</delete>
+	</update>
 	<update id="updateReport" parameterClass="java.util.HashMap">
 		update T2_REPORT t
 		   set 
