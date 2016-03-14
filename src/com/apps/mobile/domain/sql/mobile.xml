@@ -237,13 +237,13 @@
      <update id="updatePassword" parameterClass="java.util.HashMap">
       update t2_user
       set password='$newPassword$'  
-		where user_id='$user_id$'
+		where phone_number in(select phone_number from t2_user where user_id='$user_id$')
      </update> 
       <!-- 二期修改  修改手势码-->
        <update id="updatePattern" parameterClass="java.util.HashMap">
       update t2_user
       set pattern_code='$newPassword$'  
-		where user_id='$user_id$'
+		where phone_number in(select phone_number from t2_user where user_id='$user_id$')
      </update>  
      <select id="isApplyForRegist" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		select count(*)
