@@ -523,13 +523,15 @@
 		 select
 		    t.market_id, /*营销活动id*/
 		    t.market_name,/*营销活动名称*/
+			to_char(t.end_date,'yyyymmdd') end_date,
 		    to_char(sum(case when t.deal_flag = 1 then 1 else 0 end)/count(1)*100.00,'FM99990.00')||'%' finish_rate/*当前完成情况*/
 		  from t2_market_list t
 		 where sysdate between begin_date and end_date
 		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
 		 group by 
 		    t.market_id,
-		    t.market_name
+		    t.market_name,
+        	to_char(t.end_date,'yyyymmdd')
 		   order by t.market_id
 	</select>
     <select id="getMarketExecList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
@@ -550,7 +552,9 @@
 		       t.campseg_content, /*营销用语*/
 		       to_char(s.exec_time,'yyyy-mm-dd hh24:mi:ss') exec_time,/*营销时间*/
 		       s.line_info,/*营销方式*/
-		       s.exec_detail /*营销备注*/
+           		s.exec_detail, /*营销备注*/
+           		t.prod_id,   /*活动编码*/
+           		t.prod_name   /*活动内容*/
 		  from t2_market_list t,t2_market_exec s
 		 where t.market_id=s.market_id
 		   and t.serv_number=s.serv_number
@@ -560,7 +564,7 @@
 		   and t.market_id='$market_id$'
 		   and 1 = 1
 		 order by t.cur_mon_detain_times desc
-	</select>	  
+	</select>	
     <select id="getMarketClassList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
 		select t.class_id, 
 			   t.class_name,
