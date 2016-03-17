@@ -590,8 +590,7 @@
 			img_name3,
 			img_name4,
 			img_name5,
-			cdate,
-			status
+			cdate
         )
         values(
 			'$temp_id$',
@@ -626,7 +625,7 @@
             t.postil_user,
             to_char(t.postil_date,'yyyy-mm-dd hh24:mi:ss') postil_date,
             s.userPhone postil_userPhone,
-            s.userName postil_userName
+            s.userName postil_userName,
             t.postil_date
 		from T2_REPORT t
 		    left join vw_masa_user s
@@ -652,7 +651,7 @@
             t.postil_user,
             to_char(t.postil_date,'yyyy-mm-dd hh24:mi:ss') postil_date,
             s.userPhone postil_userPhone,
-            s.userName postil_userName
+            s.userName postil_userName,
             t.postil_date
 		from T2_REPORT t
 		    left join vw_masa_user s
