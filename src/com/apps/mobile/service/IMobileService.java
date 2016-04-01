@@ -1330,6 +1330,7 @@ public ResponseEmptyProperty detainMarketExec(@WebParam(name = "ticket") String 
 			MARKET_ID:营销活动ID
 			MARKET_NAME:营销活动名称
 			FINISH_RATE:当前完成情况
+			END_DATE:新增加，活动结束日期
  ********************************************************/	
 public ResponsePropertyList<Map> getMarketGroupExecList(@WebParam(name = "ticket") String ticket);
 /******************************************************
@@ -1362,7 +1363,9 @@ public ResponsePropertyList<Map> getMarketGroupExecList(@WebParam(name = "ticket
 			CAMPSEG_CONTENT:营销用语
 		    EXEC_TIME:营销时间
 		    LINE_INFO:营销方式
-		    EXEC_DETAIL:营销备注				
+		    EXEC_DETAIL:营销备注	
+			PROD_ID:活动编码
+			PROD_NAME:活动内容				    			
  ********************************************************/	
 public ResponsePropertyList<Map> getMarketExecList(@WebParam(name = "ticket") String ticket,
 		@WebParam(name = "market_id") String market_id);
