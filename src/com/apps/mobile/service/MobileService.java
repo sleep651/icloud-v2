@@ -2,7 +2,9 @@ package com.apps.mobile.service;
 
 import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,11 @@ public class MobileService implements IMobileService {
 
 	CryptUtil crypt = CryptUtil.getInstance();
 
+	//登录操作5(time_range)分钟内如果失败超过5(max_num)次，则锁定5(time_lock)分钟
+	final int MAX_NUM = 5;//最大次数
+	final int TIME_RANGE = 5;//指定时间段(单位：分钟)
+	final int TIME_LOCK = 5;//锁定时间(单位：分钟)
+	
 	public ResponseEmptyProperty testNoSql(String callTime) {
 		return new ResponseEmptyProperty(WsConstants.SHT_SUCCESS, "成功："
 				+ callTime);
@@ -372,38 +379,41 @@ public class MobileService implements IMobileService {
 			TicketVO ticket = new TicketVO();
 			
 			if (password != null && !password.trim().equals("")) {
-				userAccount = isCodeLogonSuccess(user_acct,
-						password, patterncode, package_name);
-				// ///////////2.imsi是否已注册
-				if (userAccount != null) {
-					// ///////////3.imsi+密码是否正确
-					ticket.setTicket(Ticket.getTicketNumber(userAccount));
-					ticket.setAccount(userAccount);
-					userAccount.setTicket(ticket.getTicket().toString());
-					response.setStatus(WsConstants.SHT_SUCCESS);
-					response.setMessage("登录成功!");
-					response.setEntity(userAccount);
-					// 数据读取模式：1始终通过接口读取；2缓存机制读取
-					String date_read_mode = (String) taskDao
-							.getSqlMapClientTemplate().queryForObject(
-									"mobile.getDateReadModeConfig");
-					if (date_read_mode != null && date_read_mode.equals("2")) {
-						userAccount.setIs_use_cache(true);
+				if(canLogin(user_acct)){
+					userAccount = isCodeLogonSuccess(user_acct,
+							password, patterncode, package_name);
+					// ///////////2.imsi是否已注册
+					if (userAccount != null) {
+						// ///////////3.imsi+密码是否正确
+						ticket.setTicket(Ticket.getTicketNumber(userAccount));
+						ticket.setAccount(userAccount);
+						userAccount.setTicket(ticket.getTicket().toString());
+						response.setStatus(WsConstants.SHT_SUCCESS);
+						response.setMessage("登录成功!");
+						response.setEntity(userAccount);
+						// 数据读取模式：1始终通过接口读取；2缓存机制读取
+						String date_read_mode = (String) taskDao
+								.getSqlMapClientTemplate().queryForObject(
+										"mobile.getDateReadModeConfig");
+						if (date_read_mode != null && date_read_mode.equals("2")) {
+							userAccount.setIs_use_cache(true);
+						} else {
+							userAccount.setIs_use_cache(false);
+						}
+						
 					} else {
-						userAccount.setIs_use_cache(false);
+						response.setStatus(WsConstants.SHT_VALIDATION);
+						response.setMessage("登录失败：密码错误！");
 					}
-					new InsertLogonLogThread(userAccount.getUser_acct(), userAccount.getPattern_code(),userAccount.getPassword(),response.getStatus().toString(),package_name).start();
-					
-				} else {
+					new InsertLogonLogThread(user_acct, patterncode,password,response.getStatus().toString(),package_name).start();					
+				}else{
 					response.setStatus(WsConstants.SHT_VALIDATION);
-					response.setMessage("登录失败：密码错误！");
+					response.setMessage("登录失败：登录次数过于频繁，请"+TIME_LOCK+"分钟之后再试！");
 				}
 			} else {
 				response.setStatus(WsConstants.SHT_VALIDATION);
 				response.setMessage("登录失败：用户名或密码不能为空！");
 			}
-			// 写入登录日志
-			//new InsertLogonLogThread(password,userAccount.getPattern_code(),userAccount.getLogin_type() ,response.getStatus()).start();
 		return response;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1180,6 +1190,7 @@ public class MobileService implements IMobileService {
 		params.put("pattern_code", pattern_code);
 		params.put("result", result);
 		params.put("package_name", package_name);
+		params.put("logdate", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		taskDao.insert("mobile.insertLogonLog", params);
 	}
 
@@ -1203,7 +1214,38 @@ public class MobileService implements IMobileService {
 		taskDao.insert("mobile.insertRegistCheckLog", params);
 		return id;
 	}
-
+	/******************************************************
+	 * 登录操作5分钟内如果登录失败5次，则锁定5分钟
+	 * 采取次数限制策略，5分钟内，5次登陆未成功，账户锁定，等待5分钟后解锁
+	 ********************************************************/
+	private boolean canLogin(String user_acct){
+    	String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    	//查找过去30分钟内的最近一条短信验证码
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("user_acct",user_acct);
+		params.put("minutes",""+TIME_LOCK);//指定锁定时间
+		params.put("now",now);
+		List<HashMap> list = taskDao.getSqlMapClientTemplate()
+				.queryForList("mobile.getLastLogonLogList", params);
+    	if (list!=null&&list.size()>0) {
+			HashMap logMap = list.get(0);
+			String logdate = (String) logMap.get("LOGDATE");// 日期sql    
+    		//now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(logdate); 
+			now = logdate;
+    	}   
+		params.put("user_acct",user_acct);
+		params.put("minutes",""+TIME_RANGE);
+		params.put("now",now);    	
+		Integer count = (Integer) taskDao
+				.getSqlMapClientTemplate().queryForObject(
+						"mobile.getLastLogonLogListCount", params);
+		
+    	if(count>=MAX_NUM){
+    		return false;
+    	}
+    	return true;
+    }
+	
 	/******************************************************
 	 * 检查ticket是否合法，如果合法，则返回对应的UserAccount，不合法则抛出异常
 	 ********************************************************/

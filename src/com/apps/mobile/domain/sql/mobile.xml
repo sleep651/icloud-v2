@@ -23,11 +23,11 @@
 	 
 	 <select id="isVersionAvailable" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		  select count(*) from t2_version
-		       where   v_no  in '$clientVersion$' and v_state='00A'
+		       where   v_no  in #clientVersion# and v_state='00A'
      </select>	
      	 <select id="isVersionAvailableNew" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		  select count(*) from t2_version
-		       where  v_no  in '$clientVersion$' and package_name = '$package_name$' and v_state='00A'
+		       where  v_no  in #clientVersion# and package_name = #package_name# and v_state='00A'
      </select>	
      <select id="getLastVersion" resultClass="ClientVersionBean" parameterClass="java.util.HashMap">
 		 select
@@ -45,7 +45,7 @@
 			 where 1=1
 			 and v_state='00A'
 		<isNotEmpty property="package_name">
-			and package_name = '$package_name$'
+			and package_name = #package_name#
 		</isNotEmpty>			 
 			 order by v_date desc,v_no desc)
 		  where rownum = 1 
@@ -107,16 +107,16 @@
 		from t2_user u
 		where u.status = '00A'
 		<isNotEmpty property="pattern_code">
-			and u.pattern_code='$pattern_code$'
+			and u.pattern_code=#pattern_code#
 		</isNotEmpty>
 		<isNotEmpty property="user_acct">
-			and u.user_acct='$user_acct$'
+			and u.user_acct=#user_acct#
 		</isNotEmpty>
 		<isNotEmpty property="password">
-			and u.password='$password$'
+			and u.password=#password#
 		</isNotEmpty>
 		<isNotEmpty property="package_name">
-			and u.package_name = '$package_name$'
+			and u.package_name = #package_name#
 		</isNotEmpty>
 	</select>
 
@@ -157,15 +157,32 @@
 		PACKAGE_NAME
 		)
 		values(
-		'$user_acct$',
-		'$password$',
-		'$pattern_code$',
-		sysdate,
+		#user_acct#,
+		#password#,
+		#pattern_code#,
+		to_date('$logdate$', 'yyyy-MM-dd HH24:mi:ss'),
 		'$result$',
-		'$package_name$'
+		#package_name#
 		)
 	</insert>
-
+    <select id="getLastLogonLogList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select user_acct,
+	       pattern_code,
+	       to_char(logdate, 'yyyy-MM-dd HH24:mi:ss') logdate,
+	       result,
+	       user_pwd,
+	       package_name
+       from T2_LOGON u
+			where u.logdate <![CDATA[>=]]> (to_date(#now#, 'yyyy-MM-dd HH24:mi:ss')-$minutes$/24/60) 
+              and u.logdate <![CDATA[<=]]> to_date(#now#, 'yyyy-MM-dd HH24:mi:ss')
+              and u.user_acct = #user_acct# and u.result = 1 order by u.logdate desc
+    </select>  
+    <select id="getLastLogonLogListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from T2_LOGON u
+			where u.logdate <![CDATA[>=]]> (to_date(#now#, 'yyyy-MM-dd HH24:mi:ss')-$minutes$/24/60) 
+              and u.logdate <![CDATA[<=]]> to_date(#now#, 'yyyy-MM-dd HH24:mi:ss')
+              and u.user_acct = #user_acct# and u.result = 1 order by u.logdate desc
+    </select>  
 	<insert id="insertRegistCheckLog" parameterClass="java.util.HashMap">
 		insert into T2_REGIST_CHECK_LOG
 		(
@@ -183,18 +200,18 @@
 		PACKAGE_NAME
 		)
 		values(
-		'$id$',
-		'$phone_number$',
-		'$user_name$',
-		'$imeiCode$',
-		'$imsiCode$',
-		'$systemVersion$',
-		'$clientVersion$',
-		'$result$',
-		'$posOrgId$',
-		'$phone_number$',
+		#id#,
+		#phone_number#,
+		#user_name#,
+		#imeiCode#,
+		#imsiCode#,
+		#systemVersion#,
+		#clientVersion#,
+		#result#,
+		#posOrgId#,
+		#phone_number#,
 		sysdate,
-		'$pakname$'
+		#pakname#
 		)
 	</insert>
 	
@@ -210,47 +227,47 @@
      <!-- 二期 申请注册修改 -->
       <update id="applyForRegist" parameterClass="java.util.HashMap">
       update T2_REGIST_CHECK_LOG
-      	set user_name='$user_name$',
-	      	IMEI='$imeiCode$',
-	      	IMSI='$imsiCode$',
-	      	SYSTEMVERSION='$systemVersion$',
-	      	CLIENTVERSION='$clientVersion$'
-	  where	phone_number='$phone_number$'
+      	set user_name=#user_name#,
+	      	IMEI=#imeiCode#,
+	      	IMSI=#imsiCode#,
+	      	SYSTEMVERSION=#systemVersion#,
+	      	CLIENTVERSION=#clientVersion#
+	  where	phone_number=#phone_number#
      </update> 	
      <!-- 检查是否已经申请注册 -->
        <select id="testApplyForRegist" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		select count(*) from T2_REGIST_CHECK_LOG
-			where phone_number='$phone_number$'
+			where phone_number=#phone_number#
      </select>
      <select id="testApplyUser" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		SELECT COUNT(*) FROM T2_USER
-		  WHERE phone_number='$phone_number$'
+		  WHERE phone_number=#phone_number#
      </select>
      <!-- 原修改手势码备份 -->    
      <!-- <update id="updatePattern" parameterClass="java.util.HashMap">
       update t2_user
-      set pattern_code='$newPassword$'
+      set pattern_code=#newPassword#
       where pattern_code='$oldPassword$'   
 		and user_id='$user_id$'
      </update>  --> 
      <!-- 二期修改  修改密码 -->
      <update id="updatePassword" parameterClass="java.util.HashMap">
       update t2_user
-      set password='$newPassword$'  
-		where phone_number in(select phone_number from t2_user where user_id='$user_id$')
+      set password=#newPassword#  
+		where phone_number in(select phone_number from t2_user where user_id=#user_id#)
      </update> 
       <!-- 二期修改  修改手势码-->
        <update id="updatePattern" parameterClass="java.util.HashMap">
       update t2_user
-      set pattern_code='$newPassword$'  
-		where phone_number in(select phone_number from t2_user where user_id='$user_id$')
+      set pattern_code=#newPassword#  
+		where phone_number in(select phone_number from t2_user where user_id=#user_id#)
      </update>  
      <select id="isApplyForRegist" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		select count(*)
 		  	from T2_REGIST_CHECK_LOG
 		 where result = '1'
-			and imsi='$imsiCode$'
-			and imei='$imeiCode$'
+			and imsi=#imsiCode#
+			and imei=#imeiCode#
      </select>	  
      <select id="testSimpleSql" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		  select count(*) from dual
@@ -266,7 +283,7 @@
 		 t2_user_role p1,
 		 t2_role_home_page p2,
 		 t2_home_page p3
-		where p1.user_id = '$user_id$'
+		where p1.user_id = #user_id#
 		   and p1.role_id = p2.role_id
 		   and p2.rep_id=p3.rep_id
 		   order by rep_pos
@@ -282,7 +299,7 @@
 		       rep_pos,
 		       data_source_id data_source
 		  from t2_home_page
-		 where rep_id = '$rep_id$'
+		 where rep_id = #rep_id#
      </select>  		 
      <select id="getDynamicRepOfString" resultClass="java.lang.String" parameterClass="java.util.HashMap" remapResults="true" >
 		$sql$
@@ -329,14 +346,14 @@
 		where t.menu_state='00A'
 		and t.menu_id = s.menu_id
 		<isNotEmpty property="user_id">
-			and s.user_id='$user_id$'
+			and s.user_id=#user_id#
 		</isNotEmpty>
 		<!-- and t.menu_lvl=1 -->
 		<isNotEmpty property="super_menu">
-			and t.super_menu='$super_menu$'
+			and t.super_menu=#super_menu#
 		</isNotEmpty>
 		<isNotEmpty property="tab_id">
-			and t.tab_id='$tab_id$'
+			and t.tab_id=#tab_id#
 		</isNotEmpty>
 		order by t.menu_pos
 	</select>
@@ -353,9 +370,9 @@
 		t2_home_page p2
 		where
 		p1.rep_id=p2.rep_id
-		and p1.super_menu = '$parentId$'
+		and p1.super_menu = #parentId#
 		<isNotEmpty property="tab_id">
-			and p1.tab_id='$tab_id$'
+			and p1.tab_id=#tab_id#
 		</isNotEmpty>
 		order by p1.menu_pos
 	</select>  
@@ -377,7 +394,7 @@
      <!-- 获得最新时间 量化薪酬社会53019-->
        <select id="getRepDateSql" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
 		select rep_sql, rep_date_sql from t2_home_page t where t.rep_desc='量化薪酬'
-		and  rep_name='$rep_name$'
+		and  rep_name=#rep_name#
      </select>	 	 
      
       <select id="getRepDate" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" remapResults="true" >
@@ -391,13 +408,13 @@
 		select order_id, rep_id, rep_name, statis_date, org_id, org_name, ind_c1, ind_c2, ind_c3, ind_c4, ind_c5, ind_c6, ind_c7, ind_c8, ind_c9, ind_c10, ind_c11, ind_c12 from t2_graphical_analysis
 		where 1=1
 		<isNotEmpty property="order_id">
-			and order_id='$order_id$'
+			and order_id=#order_id#
 		</isNotEmpty>   	
 		<isNotEmpty property="statis_date">
-			and statis_date='$statis_date$'
+			and statis_date=#statis_date#
 		</isNotEmpty>   	
 		<isNotEmpty property="org_id">
-			and org_id='$org_id$'
+			and org_id=#org_id#
 		</isNotEmpty>   	
      </select>	   
      <resultMap class="com.apps.mobile.domain.Customization" id="cus">
@@ -414,7 +431,7 @@
   		from t2_home_chart t, t2_chart_customization s
 		where t.chart_id=s.chart_id 
 		<isNotEmpty property="userId">
-		and	s.user_id='$userId$'
+		and	s.user_id=#userId#
 		</isNotEmpty>
 		order by t.pos	
      </select>	
@@ -425,10 +442,10 @@
 		select DIM_SQL,CHART_DATA_SQL, ALARM_SQL,CHART_TITLE_SQL,CHART_CONDITION_SQL from t2_chart_config t 
 		where 1=1
 		<isNotEmpty property="chartId">
-			and	chart_id='$chartId$'
+			and	chart_id=#chartId#
 		</isNotEmpty> 
 		<isNotEmpty property="dimId">
-			and dim_id='$dimId$'
+			and dim_id=#dimId#
 		</isNotEmpty>
 		
      </select>
@@ -455,10 +472,10 @@
 		select t.chart_type from t2_chart_config t
 		where 1=1
 		<isNotEmpty property="chartId">
-			and	t.chart_id='$chartId$'
+			and	t.chart_id=#chartId#
 		</isNotEmpty> 
 		<isNotEmpty property="dimId">
-			and t.dim_id='$dimId$'
+			and t.dim_id=#dimId#
 		</isNotEmpty>
 		
      </select>     
@@ -471,7 +488,7 @@
 		    count(distinct t.serv_number) market_cnt
 		  from t2_market_list t
 		 where sysdate between begin_date and end_date
-		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
+		   and (t.coun_manager_id=#user_id# or t.chnl_manager_id=#user_id#)
 		 group by 
 		    t.market_id,
 		    t.market_name,
@@ -499,13 +516,13 @@
 		       t.prod_id,   /*活动编码*/
                t.prod_name   /*活动内容*/
 		  from t2_market_list t
-		 where (t.coun_manager_id = '$user_id$' or
-		       t.chnl_manager_id = '$user_id$')
+		 where (t.coun_manager_id = #user_id# or
+		       t.chnl_manager_id = #user_id#)
 		   and t.deal_flag = 2
 		<isNotEmpty property="class_id">
-			and t.class_id = '$class_id$'
+			and t.class_id = #class_id#
 		</isNotEmpty>		   
-		   and t.market_id= '$market_id$'
+		   and t.market_id= #market_id#
 		 order by t.cur_mon_detain_times desc
 	</select>
     <parameterMap id="ExecMarketMap" class="java.util.Map">
@@ -527,7 +544,7 @@
 		    to_char(sum(case when t.deal_flag = 1 then 1 else 0 end)/count(1)*100.00,'FM99990.00')||'%' finish_rate/*当前完成情况*/
 		  from t2_market_list t
 		 where sysdate between begin_date and end_date
-		   and (t.coun_manager_id='$user_id$' or t.chnl_manager_id='$user_id$')
+		   and (t.coun_manager_id=#user_id# or t.chnl_manager_id=#user_id#)
 		 group by 
 		    t.market_id,
 		    t.market_name,
@@ -558,10 +575,10 @@
 		  from t2_market_list t,t2_market_exec s
 		 where t.market_id=s.market_id
 		   and t.serv_number=s.serv_number
-		   and (t.coun_manager_id = '$user_id$' or
-		       t.chnl_manager_id = '$user_id$')
+		   and (t.coun_manager_id = #user_id# or
+		       t.chnl_manager_id = #user_id#)
 		   and t.deal_flag = 1
-		   and t.market_id='$market_id$'
+		   and t.market_id=#market_id#
 		   and 1 = 1
 		 order by t.cur_mon_detain_times desc
 	</select>	
@@ -572,9 +589,9 @@
 		  from t2_market_class t,  
 		  	   t2_market_list s
 		 where t.market_id=s.market_id and t.class_id=s.class_id
-		   and (s.coun_manager_id='$user_id$' or s.chnl_manager_id='$user_id$')
+		   and (s.coun_manager_id=#user_id# or s.chnl_manager_id=#user_id#)
 		   and s.deal_flag = 2
-		   and t.market_id = '$market_id$'
+		   and t.market_id = #market_id#
 		 group by t.class_id, t.class_name
 	</select>	
 	<insert id="addReport" parameterClass="java.util.HashMap">
@@ -597,17 +614,17 @@
 			cdate
         )
         values(
-			'$temp_id$',
-			'$org_id$',
-			'$user_id$',
-			'$flag_id$',
-			'$title$',
-			'$content$',
-			'$img_name1$',
-			'$img_name2$',
-			'$img_name3$',
-			'$img_name4$',
-			'$img_name5$',
+			#temp_id#,
+			#org_id#,
+			#user_id#,
+			#flag_id#,
+			#title#,
+			#content#,
+			#img_name1#,
+			#img_name2#,
+			#img_name3#,
+			#img_name4#,
+			#img_name5#,
 			sysdate
 	     )
 	</insert>	
@@ -634,7 +651,7 @@
 		from T2_REPORT t
 		    left join vw_masa_user s
 		      on t.postil_user=s.userId
-			where flag_id='$flag_id$' and user_id='$user_id$'
+			where flag_id=#flag_id# and user_id=#user_id#
 		order by rep_id desc
 	</select>		        	 
     <select id="getReportDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
@@ -660,42 +677,42 @@
 		from T2_REPORT t
 		    left join vw_masa_user s
 		      on t.postil_user=s.userId
-			where t.rep_id='$rep_id$'			
+			where t.rep_id=#rep_id#			
 	</select>		        	 
     <select id="getReportListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
 		select count(*) 
 			from T2_REPORT
-		where flag_id='$flag_id$' and user_id='$user_id$'
+		where flag_id=#flag_id# and user_id=#user_id#
 	</select>	
 	<delete id="delReport" parameterClass="java.util.HashMap">
-		delete from T2_REPORT t where rep_id='$rep_id$'
+		delete from T2_REPORT t where rep_id=#rep_id#
 	</delete>
 	<update id="approveReport" parameterClass="java.util.HashMap">
 		update T2_REPORT t
 		   set 
-				status='$status$',		   
-				postil='$postil$',		   
-				postil_user='$postil_user$',		   
+				status=#status#,		   
+				postil=#postil#,		   
+				postil_user=#postil_user#,		   
 				postil_date=sysdate		   
-		 where rep_id='$rep_id$'
+		 where rep_id=#rep_id#
 	</update>
 	<update id="updateReport" parameterClass="java.util.HashMap">
 		update T2_REPORT t
 		   set 
-				org_id='$org_id$',
-				user_id='$user_id$',
-				flag_id='$flag_id$',
-				title='$title$',
-				content='$content$',
-				img_name1='$img_name1$',
-				img_name2='$img_name2$',
-				img_name3='$img_name3$',
-				img_name4='$img_name4$',
-				img_name5='$img_name5$',
+				org_id=#org_id#,
+				user_id=#user_id#,
+				flag_id=#flag_id#,
+				title=#title#,
+				content=#content#,
+				img_name1=#img_name1#,
+				img_name2=#img_name2#,
+				img_name3=#img_name3#,
+				img_name4=#img_name4#,
+				img_name5=#img_name5#,
 				cdate=sysdate		   
-		 where rep_id='$rep_id$'
+		 where rep_id=#rep_id#
     </update> 
     <select id="getPackageList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
-		select distinct t.package_name from t2_user t where t.phone_number='$phone_number$'
+		select distinct t.package_name from t2_user t where t.phone_number=#phone_number#
 	</select>	
 </sqlMap>
