@@ -353,7 +353,7 @@
 			and t.super_menu=#super_menu#
 		</isNotEmpty>
 		<isNotEmpty property="tab_id">
-			and t.tab_id=#tab_id#
+			and trim(t.tab_id)=#tab_id#
 		</isNotEmpty>
 		order by t.menu_pos
 	</select>
@@ -372,7 +372,7 @@
 		p1.rep_id=p2.rep_id
 		and p1.super_menu = #parentId#
 		<isNotEmpty property="tab_id">
-			and p1.tab_id=#tab_id#
+			and trim(p1.tab_id)=#tab_id#
 		</isNotEmpty>
 		order by p1.menu_pos
 	</select>  
