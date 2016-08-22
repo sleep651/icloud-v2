@@ -369,9 +369,12 @@ public class MobileService implements IMobileService {
 					+ user_acct + "," + patterncode + ")");
 			// /////////////0.解密加密参数(password,imeiCode,imsiCode)
 			// 登录密码解密
-			// if(password != null) {
-			// password = crypt.decryptAES(password, crypt.getKey());
-			// }
+			 if(password != null) {
+				 password = crypt.decryptAES(password, crypt.getKey());
+			 }
+			 if(patterncode != null) {
+				 patterncode = crypt.decryptAES(patterncode, crypt.getKey());
+			 }
 			CryptUtil crypt = CryptUtil.getInstance();
 
 			ResponseProperty<UserAccount> response = new ResponseProperty<UserAccount>();
@@ -471,9 +474,9 @@ public class MobileService implements IMobileService {
 			int ret = 0;// 返回值：0修改失败（原始密码错误），1修改成功，-1无效的ticket
 			UserAccount userAccount = checkTicket(ticket);
 			if (userAccount != null) {
-				// if (newPassword != null) {
-				// newPassword = crypt.decryptAES(newPassword, crypt.getKey());
-				// }
+				 if (newPassword != null) {
+				 newPassword = crypt.decryptAES(newPassword, crypt.getKey());
+				 }
 
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("user_id", userAccount.getUser_id());
